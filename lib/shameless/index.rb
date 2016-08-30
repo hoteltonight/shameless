@@ -27,7 +27,9 @@ module Shameless
 
     def put(values)
       shardable_value = values.fetch(@shard_on)
-      @model.store.put(table_name, shardable_value, values)
+      index_values = (@columns.keys + [:uuid]).each_with_object({}) {|column, o| o[column] = values.fetch(column) }
+
+      @model.store.put(table_name, shardable_value, index_values)
     end
 
     def table_name

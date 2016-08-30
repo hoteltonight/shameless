@@ -38,4 +38,12 @@ describe Shameless::Store do
     expect(fetched[:room_type]).to eq('roh')
     expect(fetched[:check_in_date]).to eq(Date.today.to_s)
   end
+
+  it 'stores non-index fields on the body' do
+    store, model = build_store
+    instance = model.put(hotel_id: 1, room_type: 'roh', check_in_date: Date.today.to_s, net_rate: 90)
+    fetched = model.where(hotel_id: 1).first
+
+    expect(fetched[:net_rate]).to eq(90)
+  end
 end
