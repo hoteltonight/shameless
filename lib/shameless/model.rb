@@ -10,6 +10,7 @@ module Shameless
     def attach_to(store, name)
       @store = store
       @name = name || self.name.downcase # TODO use activesupport?
+
       include(InstanceMethods)
     end
 
@@ -30,7 +31,7 @@ module Shameless
         created_at: Time.now # TODO does the db fill this in anyway?
       }
 
-      shardable_value = uuid[0, 4].to_i(16)
+      shardable_value = shardable_value_from_uuid(uuid)
       @store.put(table_name, shardable_value, model_values)
 
       index_values = values.merge(uuid: uuid)
@@ -62,8 +63,19 @@ module Shameless
       MessagePack.pack(values)
     end
 
+    def deserialize_body(body)
+      MessagePack.unpack(body)
+    end
+
     def where(query)
       primary_index.where(query).map {|r| new(r[:uuid]) }
+    end
+
+    def fetch_column(uuid, column)
+      shardable_value = shardable_value_from_uuid(uuid)
+      query = {uuid: uuid, column_name: column}
+
+      @store.where(table_name, shardable_value, query).order(:ref_key).last
     end
 
     private
@@ -72,11 +84,33 @@ module Shameless
       @indices.find(&:primary?)
     end
 
+    def shardable_value_from_uuid(uuid)
+      uuid[0, 4].to_i(16)
+    end
+
     module InstanceMethods
       attr_reader :uuid
 
       def initialize(uuid)
         @uuid = uuid
+      end
+
+      def [](field)
+        body[field.to_s]
+      end
+
+      def body
+        @body ||= self.class.deserialize_body(base[:body])
+      end
+
+      def base
+        @base ||= fetch_column(BASE)
+      end
+
+      private
+
+      def fetch_column(column)
+        self.class.fetch_column(uuid, column)
       end
     end
   end
