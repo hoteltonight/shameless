@@ -38,11 +38,13 @@ module Shameless
 
     def create_tables!
       @model.store.create_table!(table_name) do |t|
-        t.varchar :uuid, size: 36
-
         @columns.each do |name, type|
           t.column name, type, null: false
         end
+
+        t.varchar :uuid, size: 36
+
+        t.index @columns.keys, unique: true
       end
     end
 
