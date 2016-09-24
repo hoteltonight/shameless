@@ -22,7 +22,7 @@ module Shameless
     def put(values)
       uuid = SecureRandom.uuid
 
-      model_values = {
+      base_values = {
         uuid: uuid,
         column_name: BASE,
         ref_key: 1,
@@ -31,20 +31,20 @@ module Shameless
       }
 
       shardable_value = shardable_value_from_uuid(uuid)
-      @store.put(table_name, shardable_value, model_values)
+      @store.put(table_name, shardable_value, base_values)
 
       index_values = values.merge(uuid: uuid)
       @indices.each {|i| i.put(index_values) }
 
-      new(model_values)
+      new(uuid, base_values)
     end
 
-    def update(values, meta_attributes)
-      meta_attributes[:ref_key] += 1
-      meta_attributes[:body] = serialize_body(values)
+    def update(values, base_values)
+      base_values[:ref_key] += 1
+      base_values[:body] = serialize_body(values)
 
-      shardable_value = shardable_value_from_uuid(meta_attributes[:uuid])
-      @store.put(table_name, shardable_value, meta_attributes)
+      shardable_value = shardable_value_from_uuid(base_values[:uuid])
+      @store.put(table_name, shardable_value, base_values)
     end
 
     def table_name
@@ -75,7 +75,7 @@ module Shameless
     end
 
     def where(query)
-      primary_index.where(query).map {|r| new(r) }
+      primary_index.where(query).map {|r| new(r[:uuid]) }
     end
 
     def fetch_column(uuid, column)
@@ -96,8 +96,11 @@ module Shameless
     end
 
     module InstanceMethods
-      def initialize(meta_attributes)
-        @meta_attributes = meta_attributes
+      attr_reader :uuid
+
+      def initialize(uuid, base = nil)
+        @uuid = uuid
+        @base = base
       end
 
       def [](field)
@@ -109,11 +112,11 @@ module Shameless
       end
 
       def save
-        self.class.update(body, @meta_attributes)
+        self.class.update(body, base)
       end
 
-      def uuid
-        @meta_attributes[:uuid]
+      def ref_key
+        base[:ref_key]
       end
 
       private

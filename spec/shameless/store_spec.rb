@@ -58,4 +58,27 @@ describe Shameless::Store do
     fetched = model.where(hotel_id: 1).first
     expect(fetched[:net_rate]).to eq(100)
   end
+
+  it 'increments ref_key on update' do
+    store, model = build_store
+    instance = model.put(hotel_id: 1, room_type: 'roh', check_in_date: Date.today.to_s, net_rate: 90)
+
+    expect(instance.ref_key).to eq(1)
+
+    instance[:net_rate] = 100
+    instance.save
+
+    expect(instance.ref_key).to eq(2)
+    fetched = model.where(hotel_id: 1).first
+    expect(fetched.ref_key).to eq(2)
+  end
+
+  it 'properly loads base values when using where' do
+    store, model = build_store
+    instance = model.put(hotel_id: 1, room_type: 'roh', check_in_date: Date.today.to_s, net_rate: 90)
+
+    fetched = model.where(hotel_id: 1).first
+    expect(fetched.uuid).to eq(instance.uuid)
+    expect(fetched.ref_key).to eq(1)
+  end
 end
