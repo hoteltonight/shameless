@@ -43,7 +43,6 @@ describe Shameless::Store do
 
         index do
           integer :my_id
-
           shard_on :my_id
         end
       end
@@ -51,5 +50,50 @@ describe Shameless::Store do
 
     partition = store.send(:partitions).first
     expect(partition.from('store_mymodel_000001').count).to eq(0)
+
+    Object.send(:remove_const, :MyModel)
+    Object.send(:remove_const, :Store)
+  end
+
+  it 'names the default index "primary"' do
+    store, model = build_store do |store|
+      Store = store
+
+      class MyModel
+        Store.attach(self)
+
+        index do
+          integer :my_id
+          shard_on :my_id
+        end
+      end
+    end
+
+    partition = store.send(:partitions).first
+    expect(partition.from('store_mymodel_primary_000001').count).to eq(0)
+
+    Object.send(:remove_const, :MyModel)
+    Object.send(:remove_const, :Store)
+  end
+
+  it 'allows naming the index' do
+    store, model = build_store do |store|
+      Store = store
+
+      class MyModel
+        Store.attach(self)
+
+        index :foo do
+          integer :my_id
+          shard_on :my_id
+        end
+      end
+    end
+
+    partition = store.send(:partitions).first
+    expect(partition.from('store_mymodel_foo_000001').count).to eq(0)
+
+    Object.send(:remove_const, :MyModel)
+    Object.send(:remove_const, :Store)
   end
 end
