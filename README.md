@@ -1,8 +1,12 @@
 # Shameless
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/shameless`. To experiment with that code, run `bin/console` for an interactive prompt.
+Shameless is an implementation of a schemaless, distributed, append-only store built on top of MySQL and the Sequel gem. It was extracted from a battle-tested codebase of our main application at HotelTonight. Since it's using Sequel for database access, it could work on any database, e.g. postgres, although we've only used it with MySQL.
 
-TODO: Delete this and the text above, and describe your gem
+## Concept
+
+Shameless was born out of our need to have highly scalable, distributed storage for hotel rates. Rates are a way hotels package their rooms, they typically include check-in and check-out date, room type, rate plan, net price, discount, extra services, etc. Our original solution of storing rates in a typical relational SQL table was reaching its limits due to write congestion, migration anxiety, and high maintenance.
+
+Hotel rates change very frequently, so our solution needed to have consistent write latency. There are also mutliple agents mutating various aspects of those rates, so we wanted something that would enable versioning. We also wanted to avoid having to create migrations whenever we were adding more data to rates.
 
 ## Installation
 
@@ -38,4 +42,3 @@ Bug reports and pull requests are welcome on GitHub at https://github.com/hotelt
 ## License
 
 The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
-
