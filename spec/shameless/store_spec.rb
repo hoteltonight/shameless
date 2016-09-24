@@ -33,4 +33,23 @@ describe Shameless::Store do
     expect(fetched.uuid).to eq(instance.uuid)
     expect(fetched.ref_key).to eq(1)
   end
+
+  it 'names the model by downcasing the class name' do
+    store, model = build_store do |store|
+      Store = store
+
+      class MyModel
+        Store.attach(self)
+
+        index do
+          integer :my_id
+
+          shard_on :my_id
+        end
+      end
+    end
+
+    partition = store.send(:partitions).first
+    expect(partition.from('store_mymodel_000001').count).to eq(0)
+  end
 end

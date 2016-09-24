@@ -1,6 +1,6 @@
 RSpec.configure do |c|
   c.include(Module.new do
-    def build_store
+    def build_store(&block)
       store = Shameless::Store.new(:store) do |c|
         c.partition_urls = ['sqlite:/']
         c.shards_count = 4
@@ -17,6 +17,8 @@ RSpec.configure do |c|
           shard_on :hotel_id
         end
       end
+
+      block.call(store) if block
 
       store.create_tables!
 
