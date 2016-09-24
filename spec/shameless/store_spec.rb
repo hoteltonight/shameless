@@ -26,6 +26,7 @@ describe Shameless::Store do
     store, model = build_store
     instance = model.put(hotel_id: 1, room_type: 'roh', check_in_date: Date.today.to_s)
 
+    expect(instance.uuid).not_to be_nil
     expect(model.where(hotel_id: 1).first.uuid).to eq(instance.uuid)
   end
 
@@ -45,5 +46,16 @@ describe Shameless::Store do
     fetched = model.where(hotel_id: 1).first
 
     expect(fetched[:net_rate]).to eq(90)
+  end
+
+  it 'allows updates via the instance' do
+    store, model = build_store
+    instance = model.put(hotel_id: 1, room_type: 'roh', check_in_date: Date.today.to_s, net_rate: 90)
+
+    instance[:net_rate] = 100
+    instance.save
+
+    fetched = model.where(hotel_id: 1).first
+    expect(fetched[:net_rate]).to eq(100)
   end
 end
