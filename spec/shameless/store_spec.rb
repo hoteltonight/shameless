@@ -1,27 +1,4 @@
 describe Shameless::Store do
-  def build_store
-    store = described_class.new(:store) do |c|
-      c.partition_urls = ['sqlite:/']
-      c.shards_count = 4
-    end
-
-    model = Class.new do
-      store.attach(self, :rates)
-
-      index do
-        integer :hotel_id
-        string :room_type
-        string :check_in_date
-
-        shard_on :hotel_id
-      end
-    end
-
-    store.create_tables!
-
-    [store, model]
-  end
-
   it 'works' do
     store, model = build_store
     instance = model.put(hotel_id: 1, room_type: 'roh', check_in_date: Date.today.to_s)
@@ -46,31 +23,6 @@ describe Shameless::Store do
     fetched = model.where(hotel_id: 1).first
 
     expect(fetched[:net_rate]).to eq(90)
-  end
-
-  it 'allows updates via the instance' do
-    store, model = build_store
-    instance = model.put(hotel_id: 1, room_type: 'roh', check_in_date: Date.today.to_s, net_rate: 90)
-
-    instance[:net_rate] = 100
-    instance.save
-
-    fetched = model.where(hotel_id: 1).first
-    expect(fetched[:net_rate]).to eq(100)
-  end
-
-  it 'increments ref_key on update' do
-    store, model = build_store
-    instance = model.put(hotel_id: 1, room_type: 'roh', check_in_date: Date.today.to_s, net_rate: 90)
-
-    expect(instance.ref_key).to eq(1)
-
-    instance[:net_rate] = 100
-    instance.save
-
-    expect(instance.ref_key).to eq(2)
-    fetched = model.where(hotel_id: 1).first
-    expect(fetched.ref_key).to eq(2)
   end
 
   it 'properly loads base values when using where' do

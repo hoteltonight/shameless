@@ -27,7 +27,7 @@ module Shameless
         column_name: BASE,
         ref_key: 1,
         body: serialize_body(values),
-        created_at: Time.now # TODO does the db fill this in anyway?
+        created_at: Time.now
       }
 
       shardable_value = shardable_value_from_uuid(uuid)
@@ -117,6 +117,10 @@ module Shameless
 
       def ref_key
         base[:ref_key]
+      end
+
+      def created_at
+        base[:created_at]
       end
 
       private
