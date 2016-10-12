@@ -8,7 +8,7 @@ module Shameless
       new(model, BASE, body)
     end
 
-    def initialize(model, name, body)
+    def initialize(model, name, body = nil)
       @model = model
       @name = name
       @body = body

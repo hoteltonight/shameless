@@ -17,6 +17,15 @@ module Shameless
       @indices << Index.new(name, self, &block)
     end
 
+    def cell(name)
+      name = name.to_s
+
+      define_method(name) do
+        @cells ||= {}
+        @cells[name] ||= Cell.new(self, name)
+      end
+    end
+
     def put(values)
       uuid = SecureRandom.uuid
 
@@ -70,9 +79,9 @@ module Shameless
     module InstanceMethods
       attr_reader :uuid
 
-      def initialize(uuid, base_values = nil)
+      def initialize(uuid, base_body = nil)
         @uuid = uuid
-        @base = Cell.base(self, base_values)
+        @base = Cell.base(self, base_body)
       end
 
       def [](field)
