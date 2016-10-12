@@ -14,7 +14,10 @@ module Shameless
 
     def index(name = nil, &block)
       @indices ||= []
-      @indices << Index.new(name, self, &block)
+      index = Index.new(name, self, &block)
+      @indices << index
+
+      define_singleton_method("#{index.name}_index") { index }
     end
 
     def cell(name)
@@ -67,14 +70,10 @@ module Shameless
     end
 
     def where(query)
-      primary_index.where(query).map {|r| new(r[:uuid]) }
+      primary_index.where(query)
     end
 
     private
-
-    def primary_index
-      @indices.find(&:primary?)
-    end
 
     module InstanceMethods
       attr_reader :uuid

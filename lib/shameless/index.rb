@@ -2,6 +2,8 @@ module Shameless
   class Index
     PRIMARY = :primary
 
+    attr_reader :name
+
     def initialize(name, model, &block)
       @name = name || PRIMARY
       @model = model
@@ -32,6 +34,11 @@ module Shameless
       @model.store.put(table_name, shardable_value, index_values)
     end
 
+    def where(query)
+      shardable_value = query.fetch(@shard_on)
+      @model.store.where(table_name, shardable_value, query).map {|r| @model.new(r[:uuid]) }
+    end
+
     def table_name
       "#{@model.table_name}_#{@name}"
     end
@@ -46,15 +53,6 @@ module Shameless
 
         t.index @columns.keys, unique: true
       end
-    end
-
-    def primary?
-      @name == PRIMARY
-    end
-
-    def where(query)
-      shardable_value = query.fetch(@shard_on)
-      @model.store.where(table_name, shardable_value, query)
     end
   end
 end
