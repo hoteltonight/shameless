@@ -194,3 +194,11 @@ Bug reports and pull requests are welcome on GitHub at https://github.com/hotelt
 ## License
 
 The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
+
+## Credits
+
+Shameless was inspired by the following resources:
+
+- Uber: https://eng.uber.com/schemaless-part-one
+- FriendFeed: https://backchannel.org/blog/friendfeed-schemaless-mysql
+- Pinterest: https://engineering.pinterest.com/blog/sharding-pinterest-how-we-scaled-our-mysql-fleet
