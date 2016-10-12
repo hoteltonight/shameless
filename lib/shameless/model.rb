@@ -1,10 +1,8 @@
-require 'msgpack'
 require 'shameless/index'
+require 'shameless/cell'
 
 module Shameless
   module Model
-    BASE = 'base'
-
     attr_reader :store
 
     def attach_to(store, name)
@@ -22,29 +20,22 @@ module Shameless
     def put(values)
       uuid = SecureRandom.uuid
 
-      base_values = {
-        uuid: uuid,
-        column_name: BASE,
-        ref_key: 1,
-        body: serialize_body(values),
-        created_at: Time.now
-      }
+      new(uuid, values).tap do |model|
+        model.save
 
-      shardable_value = shardable_value_from_uuid(uuid)
-      @store.put(table_name, shardable_value, base_values)
-
-      index_values = values.merge(uuid: uuid)
-      @indices.each {|i| i.put(index_values) }
-
-      new(uuid, base_values)
+        index_values = values.merge(uuid: uuid)
+        @indices.each {|i| i.put(index_values) }
+      end
     end
 
-    def update(values, base_values)
-      base_values[:ref_key] += 1
-      base_values[:body] = serialize_body(values)
+    def put_cell(shardable_value, cell_values)
+      @store.put(table_name, shardable_value, cell_values)
+    end
 
-      shardable_value = shardable_value_from_uuid(base_values[:uuid])
-      @store.put(table_name, shardable_value, base_values)
+    def fetch_cell(shardable_value, uuid, cell_name)
+      query = {uuid: uuid, column_name: cell_name}
+
+      @store.where(table_name, shardable_value, query).order(:ref_key).last
     end
 
     def table_name
@@ -66,23 +57,8 @@ module Shameless
       @indices.each(&:create_tables!)
     end
 
-    def serialize_body(values)
-      MessagePack.pack(values)
-    end
-
-    def deserialize_body(body)
-      MessagePack.unpack(body)
-    end
-
     def where(query)
       primary_index.where(query).map {|r| new(r[:uuid]) }
-    end
-
-    def fetch_column(uuid, column)
-      shardable_value = shardable_value_from_uuid(uuid)
-      query = {uuid: uuid, column_name: column}
-
-      @store.where(table_name, shardable_value, query).order(:ref_key).last
     end
 
     private
@@ -91,50 +67,46 @@ module Shameless
       @indices.find(&:primary?)
     end
 
-    def shardable_value_from_uuid(uuid)
-      uuid[0, 4].to_i(16)
-    end
-
     module InstanceMethods
       attr_reader :uuid
 
-      def initialize(uuid, base = nil)
+      def initialize(uuid, base_values = nil)
         @uuid = uuid
-        @base = base
+        @base = Cell.base(self, base_values)
       end
 
       def [](field)
-        body[field.to_s]
+        @base[field]
       end
 
       def []=(field, value)
-        body[field.to_s] = value
+        @base[field] = value
       end
 
       def save
-        self.class.update(body, base)
+        @base.save
       end
 
       def ref_key
-        base[:ref_key]
+        @base.ref_key
       end
 
       def created_at
-        base[:created_at]
+        @base.created_at
+      end
+
+      def put_cell(cell_values)
+        self.class.put_cell(shardable_value, cell_values)
+      end
+
+      def fetch_cell(cell_name)
+       self.class.fetch_cell(shardable_value, uuid, cell_name)
       end
 
       private
 
-      def body
-        @body ||= self.class.deserialize_body(base[:body])
-      end
-
-      def base
-        @base ||= fetch_column(BASE)
-      end
-
-      def fetch_column(column)
-        self.class.fetch_column(uuid, column)
+      def shardable_value
+        uuid[0, 4].to_i(16)
       end
     end
   end
