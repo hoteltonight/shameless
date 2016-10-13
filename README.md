@@ -10,7 +10,7 @@ Hotel rates change very frequently, so our solution needed to have consistent wr
 
 ## Concept
 
-The whole idea is of Shameless is to split a regular SQL table into index tables and content tables. Index tables map the fields you want to query by to UUIDs, content tables map UUIDs to model contents (bodies). In addition, both index and content tables are sharded.
+The whole idea of Shameless is to split a regular SQL table into index tables and content tables. Index tables map the fields you want to query by to UUIDs, content tables map UUIDs to model contents (bodies). In addition, both index and content tables are sharded.
 
 The body of the model is schema-less, you can store an arbitrary data structures. Under the hood, the body is serialized using MessagePack and stored as a blob in a single database column (hence the need for index tables).
 
