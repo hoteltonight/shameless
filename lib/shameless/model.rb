@@ -73,6 +73,10 @@ module Shameless
       primary_index.where(query)
     end
 
+    def prevent_readonly_attribute_mutation!(key)
+      @indices.each {|i| i.prevent_readonly_attribute_mutation!(key) }
+    end
+
     private
 
     module InstanceMethods
@@ -109,6 +113,10 @@ module Shameless
 
       def fetch_cell(cell_name)
        self.class.fetch_cell(shardable_value, uuid, cell_name)
+      end
+
+      def prevent_readonly_attribute_mutation!(key)
+        self.class.prevent_readonly_attribute_mutation!(key)
       end
 
       private

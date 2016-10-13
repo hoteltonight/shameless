@@ -1,3 +1,5 @@
+require 'shameless/errors'
+
 module Shameless
   class Index
     PRIMARY = :primary
@@ -52,6 +54,12 @@ module Shameless
         t.varchar :uuid, size: 36
 
         t.index @columns.keys, unique: true
+      end
+    end
+
+    def prevent_readonly_attribute_mutation!(key)
+      if @columns.keys.any? {|c| c.to_s == key.to_s }
+        raise ReadonlyAttributeMutation, "The attribute #{key} cannot be modified because it's part of the #{@name} index"
       end
     end
   end

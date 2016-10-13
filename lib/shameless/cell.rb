@@ -19,6 +19,7 @@ module Shameless
     end
 
     def []=(key, value)
+      @model.prevent_readonly_attribute_mutation!(key)
       body[key.to_s] = value
     end
 

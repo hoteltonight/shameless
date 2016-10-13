@@ -18,6 +18,22 @@ describe Shameless::Model do
     expect(fetched[:net_rate]).to eq(100)
   end
 
+  it 'prevents updates to index fields' do
+    store, model = build_store
+    instance = model.put(hotel_id: 1, room_type: 'roh', check_in_date: Date.today.to_s, net_rate: 90)
+
+    message = "The attribute hotel_id cannot be modified because it's part of the primary index"
+    expect { instance[:hotel_id] = 2 }.to raise_error(Shameless::ReadonlyAttributeMutation, message)
+  end
+
+  it 'prevents updates to index fields even when accessed as strings' do
+    store, model = build_store
+    instance = model.put(hotel_id: 1, room_type: 'roh', check_in_date: Date.today.to_s, net_rate: 90)
+
+    message = "The attribute hotel_id cannot be modified because it's part of the primary index"
+    expect { instance['hotel_id'] = 2 }.to raise_error(Shameless::ReadonlyAttributeMutation, message)
+  end
+
   it 'increments ref_key on update' do
     store, model = build_store
     instance = model.put(hotel_id: 1, room_type: 'roh', check_in_date: Date.today.to_s, net_rate: 90)
