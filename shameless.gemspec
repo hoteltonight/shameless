@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Olek Janiszewski"]
   spec.email         = ["olek@hoteltonight.com"]
 
-  spec.summary       = %q{Scalable distributed append-only data store built}
+  spec.summary       = %q{Scalable distributed append-only data store}
   spec.homepage      = "https://github.com/hoteltonight/shameless"
   spec.license       = "MIT"
 
