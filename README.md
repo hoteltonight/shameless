@@ -150,7 +150,7 @@ rate.meta.save
 rates = Rate.where(hotel_id: 1, room_type: '1 bed', check_in_date: Date.today)
 
 # Querying by a named index
-rates = Rate.secondary.where(hotel_id: 1, gateway: 'pegasus', discount_type: 'geo')
+rates = Rate.secondary_index.where(hotel_id: 1, gateway: 'pegasus', discount_type: 'geo')
 rates.first[:net_price] # => 130.0
 ```
 
