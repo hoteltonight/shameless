@@ -117,7 +117,7 @@ end
 
 Model content is stored in blobs called "cells". You can think of cells as separate model columns that can store rich data structures and can change independently over time. The default cell is called "base" (that's what all model-level accessors delegate to), but you can declare additional cells using `Model.cell`:
 
-```
+```ruby
 class Rate
   RateStore.attach(self)
 
