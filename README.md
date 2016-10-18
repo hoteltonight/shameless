@@ -53,7 +53,7 @@ Once you've got the Store configured, you can declare models.
 
 ### Declaring models
 
-Models specify the kinds of entities you want to persist in your store. Models are simple Ruby classes (even anonymous) that you attach to a `Store` using `Store#attach_to(model)`, e.g.:
+Models specify the kinds of entities you want to persist in your store. Models are simple Ruby classes (even anonymous) that you attach to a `Store` using `Store#attach(model)`, e.g.:
 
 ```ruby
 # app/models/rate.rb
