@@ -27,6 +27,13 @@ module Shameless
       find_table(table_name, shardable_value).where(query)
     end
 
+    def disconnect
+      if instance_variable_defined?(:@partitions)
+        partitions.each(&:disconnect)
+        remove_instance_variable(:@partitions)
+      end
+    end
+
     def create_tables!
       @models.each(&:create_tables!)
     end

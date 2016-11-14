@@ -105,4 +105,14 @@ describe Shameless::Store do
       expect(store.padded_shard(35)).to eq('000003')
     end
   end
+
+  describe '#disconnect' do
+    it 'nullifies partitions' do
+      store, _ = build_store
+
+      store.disconnect
+
+      expect(store.instance_variable_get(:@partitions)).to be_nil
+    end
+  end
 end
