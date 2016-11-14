@@ -96,4 +96,13 @@ describe Shameless::Store do
     Object.send(:remove_const, :MyModel)
     Object.send(:remove_const, :Store)
   end
+
+  describe '#padded_shard' do
+    it 'returns a 6-digit shard number' do
+      store, _ = build_store
+
+      expect(store.padded_shard(1)).to eq('000001')
+      expect(store.padded_shard(35)).to eq('000003')
+    end
+  end
 end

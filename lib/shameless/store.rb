@@ -39,6 +39,11 @@ module Shameless
       end
     end
 
+    def padded_shard(shardable_value)
+      shard = find_shard(shardable_value)
+      format_shard(shard)
+    end
+
     private
 
     def partitions
@@ -50,12 +55,20 @@ module Shameless
     end
 
     def table_name_with_shard(table_name, shard)
-      padded_shard = shard.to_s.rjust(6, '0')
+      padded_shard = format_shard(shard)
       "#{table_name}_#{padded_shard}"
     end
 
+    def format_shard(shard)
+      shard.to_s.rjust(6, '0')
+    end
+
+    def find_shard(shardable_value)
+      shardable_value % @configuration.shards_count
+    end
+
     def find_table(table_name, shardable_value)
-      shard = shardable_value % @configuration.shards_count
+      shard = find_shard(shardable_value)
       partition = find_partition_for_shard(shard)
       table_name = table_name_with_shard(table_name, shard)
       partition.from(table_name)
