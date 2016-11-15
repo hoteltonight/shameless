@@ -42,7 +42,11 @@ module Shameless
     end
 
     def table_name
-      "#{@model.table_name}_#{@name}"
+      "#{@model.table_name}_#{full_name}"
+    end
+
+    def full_name
+      "#{@name}_index"
     end
 
     def create_tables!

@@ -72,7 +72,7 @@ describe Shameless::Store do
 
     partition = nil
     store.each_partition {|p| partition ||= p }
-    expect(partition.from('store_mymodel_primary_000001').count).to eq(0)
+    expect(partition.from('store_mymodel_primary_index_000001').count).to eq(0)
 
     Object.send(:remove_const, :MyModel)
     Object.send(:remove_const, :Store)
@@ -94,7 +94,7 @@ describe Shameless::Store do
 
     partition = nil
     store.each_partition {|p| partition ||= p }
-    expect(partition.from('store_mymodel_foo_000001').count).to eq(0)
+    expect(partition.from('store_mymodel_foo_index_000001').count).to eq(0)
 
     Object.send(:remove_const, :MyModel)
     Object.send(:remove_const, :Store)
@@ -145,9 +145,9 @@ describe Shameless::Store do
         expect(partition).to be_an_instance_of(Sequel::SQLite::Database)
       end
       expect(table_names_by_partition.values.first).to eq(%w[store_rates_000000 store_rates_000001
-        store_rates_primary_000000 store_rates_primary_000001])
+        store_rates_primary_index_000000 store_rates_primary_index_000001])
       expect(table_names_by_partition.values.last).to eq(%w[store_rates_000002 store_rates_000003
-        store_rates_primary_000002 store_rates_primary_000003])
+        store_rates_primary_index_000002 store_rates_primary_index_000003])
     end
   end
 end

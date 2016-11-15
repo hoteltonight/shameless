@@ -95,7 +95,7 @@ class Rate
 end
 ```
 
-The default index is called a primary index, the corresponding tables would be called `rate_store_rate_primary_[000000-000511]`. You can add additional indices you'd like to query by:
+The default index is called a primary index, the corresponding tables would be called `rate_store_rate_primary_index_[000000-000511]`. You can add additional indices you'd like to query by:
 
 ```ruby
 class Rate

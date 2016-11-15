@@ -17,7 +17,7 @@ module Shameless
       index = Index.new(name, self, &block)
       @indices << index
 
-      define_singleton_method("#{index.name}_index") { index }
+      define_singleton_method(index.full_name) { index }
     end
 
     def cell(name)

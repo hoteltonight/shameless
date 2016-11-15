@@ -1,5 +1,6 @@
 ### Unreleased
 
+* Name index tables `*_:name_index_*`
 * Add `Configuration#database_extensions`, they're being passed to the Sequel adapter
 * Add `Configuration#connection_options`, they're being passed to the Sequel adapter
 * Don't prefix table names with underscore when store name is `nil`
