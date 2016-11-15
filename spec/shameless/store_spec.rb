@@ -48,7 +48,8 @@ describe Shameless::Store do
       end
     end
 
-    partition = store.send(:partitions).first
+    partition = nil
+    store.each_partition {|p| partition ||= p }
     expect(partition.from('store_mymodel_000001').count).to eq(0)
 
     Object.send(:remove_const, :MyModel)
@@ -69,7 +70,8 @@ describe Shameless::Store do
       end
     end
 
-    partition = store.send(:partitions).first
+    partition = nil
+    store.each_partition {|p| partition ||= p }
     expect(partition.from('store_mymodel_primary_000001').count).to eq(0)
 
     Object.send(:remove_const, :MyModel)
@@ -90,7 +92,8 @@ describe Shameless::Store do
       end
     end
 
-    partition = store.send(:partitions).first
+    partition = nil
+    store.each_partition {|p| partition ||= p }
     expect(partition.from('store_mymodel_foo_000001').count).to eq(0)
 
     Object.send(:remove_const, :MyModel)
@@ -113,6 +116,26 @@ describe Shameless::Store do
       store.disconnect
 
       expect(store.instance_variable_get(:@partitions)).to be_nil
+    end
+  end
+
+  describe '#each_partition' do
+    it 'yields all partitions and their table names' do
+      store, _ = build_store(partitions_count: 2)
+      table_names_by_partition = {}
+
+      store.each_partition do |partition, table_names|
+        table_names_by_partition[partition] = table_names
+      end
+
+      expect(table_names_by_partition.count).to eq(2)
+      table_names_by_partition.keys.each do |partition|
+        expect(partition).to be_an_instance_of(Sequel::SQLite::Database)
+      end
+      expect(table_names_by_partition.values.first).to eq(%w[store_rates_000000 store_rates_000001
+        store_rates_primary_000000 store_rates_primary_000001])
+      expect(table_names_by_partition.values.last).to eq(%w[store_rates_000002 store_rates_000003
+        store_rates_primary_000002 store_rates_primary_000003])
     end
   end
 end

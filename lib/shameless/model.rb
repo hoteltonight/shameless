@@ -54,6 +54,10 @@ module Shameless
       "#{@store.name}_#{@name}"
     end
 
+    def table_names
+      [table_name, *@indices.map(&:table_name)]
+    end
+
     def create_tables!
       @store.create_table!(table_name) do |t|
         t.primary_key :id

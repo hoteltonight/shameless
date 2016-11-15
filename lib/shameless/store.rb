@@ -34,6 +34,12 @@ module Shameless
       end
     end
 
+    def each_partition(&block)
+      partitions.each do |partition|
+        block.call(partition, table_names_on_partition(partition))
+      end
+    end
+
     def create_tables!
       @models.each(&:create_tables!)
     end
@@ -55,6 +61,16 @@ module Shameless
 
     def partitions
       @partitions ||= @configuration.partition_urls.map {|url| Sequel.connect(url) }
+    end
+
+    def table_names_on_partition(partition)
+      partition_index = partitions.index(partition)
+      first_shard = partition_index * @configuration.shards_per_partition_count
+      last_shard = first_shard + @configuration.shards_per_partition_count - 1
+      shards = first_shard..last_shard
+      table_names = @models.flat_map(&:table_names)
+
+      table_names.flat_map {|t| shards.map {|s| table_name_with_shard(t, s) } }
     end
 
     def each_shard(&block)

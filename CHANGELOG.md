@@ -1,5 +1,6 @@
 ### Unreleased
 
+* Add `Store#each_partition`
 * Add `Store#disconnect`
 
 ### 0.2.0 (2016-11-14)
