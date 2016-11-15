@@ -1,5 +1,6 @@
 ### Unreleased
 
+* Don't prefix table names with underscore when store name is `nil`
 * Add `Store#each_partition`
 * Add `Store#disconnect`
 

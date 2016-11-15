@@ -1,7 +1,7 @@
 RSpec.configure do |c|
   c.include(Module.new do
-    def build_store(partitions_count: 1, &block)
-      store = Shameless::Store.new(:store) do |c|
+    def build_store(name: :store, partitions_count: 1, &block)
+      store = Shameless::Store.new(name) do |c|
         c.partition_urls = Array.new(partitions_count) { 'sqlite:/' }
         c.shards_count = 4
       end

@@ -47,4 +47,18 @@ describe Shameless::Model do
     fetched = model.where(hotel_id: 1).first
     expect(fetched.ref_key).to eq(2)
   end
+
+  describe '#table_name' do
+    it 'concatenates store name and model name' do
+      _, model = build_store
+
+      expect(model.table_name).to eq("store_rates")
+    end
+
+    it 'does not prefix table names if store name is nil' do
+      _, model = build_store(name: nil)
+
+      expect(model.table_name).to eq("rates")
+    end
+  end
 end

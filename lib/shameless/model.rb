@@ -51,7 +51,7 @@ module Shameless
     end
 
     def table_name
-      "#{@store.name}_#{@name}"
+      [@store.name, @name].compact.join('_')
     end
 
     def table_names
