@@ -105,6 +105,13 @@ describe Shameless::Store do
     build_store(connection_options: {max_connections: 7})
   end
 
+  it 'passes database extensions to Sequel' do
+    db = double(Sequel::SQLite::Database).as_null_object
+    allow(Sequel).to receive(:connect).and_return(db)
+    expect(db).to receive(:extension).with(:foo)
+    build_store(database_extensions: [:foo])
+  end
+
   describe '#padded_shard' do
     it 'returns a 6-digit shard number' do
       store, _ = build_store

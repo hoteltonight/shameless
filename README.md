@@ -45,6 +45,7 @@ RateStore = Shameless::Store.new(:rate_store) do |c|
   c.partition_urls = [ENV['RATE_STORE_DATABASE_URL_0'], ENV['RATE_STORE_DATABASE_URL_1']
   c.shards_count = 512 # total number of shards across all partitions
   c.connection_options = {max_connections: 10} # connection options passed to Sequel.connect
+  c.database_extensions = [:newrelic_instrumentation]
 end
 ```
 

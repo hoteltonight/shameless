@@ -1,6 +1,6 @@
 module Shameless
   class Configuration
-    attr_accessor :partition_urls, :shards_count, :connection_options
+    attr_accessor :partition_urls, :shards_count, :connection_options, :database_extensions
 
     def shards_per_partition_count
       shards_count / partitions_count
