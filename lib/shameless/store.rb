@@ -60,7 +60,11 @@ module Shameless
     private
 
     def partitions
-      @partitions ||= @configuration.partition_urls.map {|url| Sequel.connect(url) }
+      @partitions ||= @configuration.partition_urls.map {|url| connect(url) }
+    end
+
+    def connect(url)
+      Sequel.connect(url, @configuration.connection_options || Sequel::OPTS)
     end
 
     def table_names_on_partition(partition)

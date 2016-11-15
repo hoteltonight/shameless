@@ -1,5 +1,6 @@
 ### Unreleased
 
+* Add `Configuration#connection_options`, they're being passed to the Sequel adapter
 * Don't prefix table names with underscore when store name is `nil`
 * Add `Store#each_partition`
 * Add `Store#disconnect`

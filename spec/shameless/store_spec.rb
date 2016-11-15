@@ -100,6 +100,11 @@ describe Shameless::Store do
     Object.send(:remove_const, :Store)
   end
 
+  it 'passes connection options to Sequel' do
+    expect(Sequel).to receive(:connect).with(anything, max_connections: 7).and_call_original
+    build_store(connection_options: {max_connections: 7})
+  end
+
   describe '#padded_shard' do
     it 'returns a 6-digit shard number' do
       store, _ = build_store

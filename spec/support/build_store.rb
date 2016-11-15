@@ -1,9 +1,10 @@
 RSpec.configure do |c|
   c.include(Module.new do
-    def build_store(name: :store, partitions_count: 1, &block)
+    def build_store(name: :store, partitions_count: 1, connection_options: nil, &block)
       store = Shameless::Store.new(name) do |c|
         c.partition_urls = Array.new(partitions_count) { 'sqlite:/' }
         c.shards_count = 4
+        c.connection_options = connection_options if connection_options
       end
 
       model = Class.new do
