@@ -61,6 +61,10 @@ module Shameless
       0.upto(@configuration.shards_count - 1, &block)
     end
 
+    def find_shard(shardable_value)
+      shardable_value % @configuration.shards_count
+    end
+
     private
 
     def partitions
@@ -90,10 +94,6 @@ module Shameless
 
     def format_shard(shard)
       shard.to_s.rjust(6, '0')
-    end
-
-    def find_shard(shardable_value)
-      shardable_value % @configuration.shards_count
     end
 
     def find_table(table_name, shardable_value)

@@ -1,5 +1,6 @@
 ### Unreleased
 
+* Make `Store#find_shard` public
 * Make `Store#each_shard` public
 * Name index tables `*_:name_index_*`
 * Add `Configuration#database_extensions`, they're being passed to the Sequel adapter
