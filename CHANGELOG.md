@@ -1,5 +1,6 @@
 ### Unreleased
 
+* Expose `Model#base`
 * Add `Configuration#legacy_created_at_is_bigint`
 * Keep a reference to only one model class per table name
 * Make `Store#find_shard` public

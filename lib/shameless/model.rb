@@ -86,7 +86,7 @@ module Shameless
     private
 
     module InstanceMethods
-      attr_reader :uuid
+      attr_reader :uuid, :base
 
       def initialize(uuid, base_body = nil)
         @uuid = uuid
