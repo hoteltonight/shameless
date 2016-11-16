@@ -11,7 +11,7 @@ module Shameless
     def initialize(model, name, body = nil)
       @model = model
       @name = name
-      @body = body
+      @body = stringify_keys(body)
     end
 
     def [](key)
@@ -47,6 +47,10 @@ module Shameless
     end
 
     private
+
+    def stringify_keys(body)
+      Hash[body.map {|k, v| [k.to_s, v] }] if body
+    end
 
     def cell_values
       {

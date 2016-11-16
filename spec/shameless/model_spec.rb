@@ -19,6 +19,25 @@ describe Shameless::Model do
     end
   end
 
+  it 'unifies symbol and string keys' do
+    store, model = build_store
+    instance = model.put(hotel_id: 1, room_type: 'roh', check_in_date: Date.today.to_s, net_rate: 90)
+
+    expect(instance["net_rate"]).to eq(90)
+
+    instance[:net_rate] = 100
+    expect(instance["net_rate"]).to eq(100)
+
+    instance["net_rate"] = 110
+    expect(instance[:net_rate]).to eq(110)
+
+    expect(instance.base.body.keys.count).to eq(4)
+
+    fetched = model.where(hotel_id: 1).first
+
+    expect(fetched.base.body.keys.count).to eq(4)
+  end
+
   it 'allows updates via the instance' do
     store, model = build_store
     instance = model.put(hotel_id: 1, room_type: 'roh', check_in_date: Date.today.to_s, net_rate: 90)
