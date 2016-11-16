@@ -15,8 +15,7 @@ module Shameless
     def attach(model_class, name = nil)
       model_class.extend(Model)
       model_class.attach_to(self, name)
-      @models ||= []
-      @models << model_class
+      models_hash[name] = model_class
     end
 
     def put(table_name, shardable_value, values)
@@ -41,7 +40,7 @@ module Shameless
     end
 
     def create_tables!
-      @models.each(&:create_tables!)
+      models.each(&:create_tables!)
     end
 
     def create_table!(table_name, &block)
@@ -67,6 +66,14 @@ module Shameless
 
     private
 
+    def models_hash
+      @models_hash ||= {}
+    end
+
+    def models
+      models_hash.values
+    end
+
     def partitions
       @partitions ||= @configuration.partition_urls.map {|url| connect(url) }
     end
@@ -82,7 +89,7 @@ module Shameless
       first_shard = partition_index * @configuration.shards_per_partition_count
       last_shard = first_shard + @configuration.shards_per_partition_count - 1
       shards = first_shard..last_shard
-      table_names = @models.flat_map(&:table_names)
+      table_names = models.flat_map(&:table_names)
 
       table_names.flat_map {|t| shards.map {|s| table_name_with_shard(t, s) } }
     end

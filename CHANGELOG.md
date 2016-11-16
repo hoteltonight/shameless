@@ -1,5 +1,6 @@
 ### Unreleased
 
+* Keep a reference to only one model class per table name
 * Make `Store#find_shard` public
 * Make `Store#each_shard` public
 * Name index tables `*_:name_index_*`
