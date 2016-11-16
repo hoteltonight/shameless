@@ -4,7 +4,7 @@ require 'shameless/model'
 
 module Shameless
   class Store
-    attr_reader :name
+    attr_reader :name, :configuration
 
     def initialize(name, &block)
       @name = name

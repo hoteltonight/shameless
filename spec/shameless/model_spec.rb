@@ -7,6 +7,18 @@ describe Shameless::Model do
     expect(instance.created_at).to be >= now
   end
 
+  describe '#legacy_created_at_is_bigint' do
+    it 'uses bigint for created_at' do
+      store, model = build_store(legacy_created_at_is_bigint: true)
+      before = Time.now
+      instance = model.put(hotel_id: 1, room_type: 'roh', check_in_date: Date.today.to_s)
+      after = Time.now
+
+      expect(instance.created_at).to be >= (before.to_f * 1000).to_i
+      expect(instance.created_at).to be <= (after.to_f * 1000).to_i
+    end
+  end
+
   it 'allows updates via the instance' do
     store, model = build_store
     instance = model.put(hotel_id: 1, room_type: 'roh', check_in_date: Date.today.to_s, net_rate: 90)

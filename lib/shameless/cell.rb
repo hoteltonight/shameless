@@ -25,6 +25,7 @@ module Shameless
 
     def save
       @created_at = Time.now
+      @created_at = (@created_at.to_f * 1000).to_i if @model.class.store.configuration.legacy_created_at_is_bigint
       @ref_key ||= 0
       @ref_key += 1
       @model.put_cell(cell_values)

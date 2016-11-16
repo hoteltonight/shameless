@@ -65,7 +65,9 @@ module Shameless
         t.varchar :column_name, null: false
         t.integer :ref_key, null: false
         t.mediumblob :body
-        t.datetime :created_at, null: false
+
+        created_at_type = @store.configuration.legacy_created_at_is_bigint ? :bigint : :datetime
+        t.column :created_at, created_at_type, null: false
 
         t.index %i[uuid column_name ref_key], unique: true
       end
