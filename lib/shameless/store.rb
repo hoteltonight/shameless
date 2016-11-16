@@ -57,6 +57,10 @@ module Shameless
       format_shard(shard)
     end
 
+    def each_shard(&block)
+      0.upto(@configuration.shards_count - 1, &block)
+    end
+
     private
 
     def partitions
@@ -77,10 +81,6 @@ module Shameless
       table_names = @models.flat_map(&:table_names)
 
       table_names.flat_map {|t| shards.map {|s| table_name_with_shard(t, s) } }
-    end
-
-    def each_shard(&block)
-      0.upto(@configuration.shards_count - 1, &block)
     end
 
     def table_name_with_shard(table_name, shard)
