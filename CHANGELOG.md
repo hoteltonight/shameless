@@ -1,5 +1,6 @@
 ### Unreleased
 
+* Add `Model#fetch` and `Cell#fetch`
 * Add `Model#reload` and `Cell#reload`
 * Add `Model#previous` and `Cell#previous`
 * `Model.put` now correctly looks up and updates an existing instance

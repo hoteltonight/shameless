@@ -137,4 +137,29 @@ describe Shameless::Cell do
       expect(instance.meta[:net_rate]).to eq(100)
     end
   end
+
+  describe '#fetch' do
+    it 'returns default when value is missing' do
+      model = build_model_with_cell
+      instance = model.put(hotel_id: 1, room_type: 'roh', check_in_date: Date.today.to_s)
+
+      expect(instance.meta.fetch(:foo, 'bar')).to eq('bar')
+    end
+
+    it 'returns value when present' do
+      model = build_model_with_cell
+      instance = model.put(hotel_id: 1, room_type: 'roh', check_in_date: Date.today.to_s)
+      instance.meta[:foo] = 'bar'
+
+      expect(instance.meta.fetch(:foo, 'baz')).to eq('bar')
+    end
+
+    it 'returns false when value of false is present' do
+      model = build_model_with_cell
+      instance = model.put(hotel_id: 1, room_type: 'roh', check_in_date: Date.today.to_s)
+      instance.meta[:foo] = false
+
+      expect(instance.meta.fetch(:foo, 'bar')).to eq(false)
+    end
+  end
 end

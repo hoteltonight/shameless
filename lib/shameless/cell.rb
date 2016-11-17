@@ -41,17 +41,17 @@ module Shameless
     end
 
     def ref_key
-      fetch
+      load
       @ref_key
     end
 
     def created_at
-      fetch
+      load
       @created_at
     end
 
     def body
-      fetch
+      load
       @body
     end
 
@@ -64,6 +64,10 @@ module Shameless
 
     def reload
       @body = @ref_key = @created_at = nil
+    end
+
+    def fetch(key, default)
+      body.key?(key.to_s) ? self[key] : default
     end
 
     private
@@ -92,7 +96,7 @@ module Shameless
 
     private
 
-    def fetch
+    def load
       if @body.nil?
         values = @model.fetch_cell(@name)
         @body = values ? deserialize_body(values[:body]) : {}

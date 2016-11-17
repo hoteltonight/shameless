@@ -142,4 +142,14 @@ describe Shameless::Model do
       expect(instance[:net_rate]).to eq(100)
     end
   end
+
+  describe '#fetch' do
+    it 'returns value from base cell' do
+      _, model = build_store
+      instance = model.put(hotel_id: 1, room_type: 'roh', check_in_date: Date.today.to_s, net_rate: 90)
+
+      expect(instance.fetch(:net_rate, 100)).to eq(90)
+      expect(instance.fetch(:foo, 'bar')).to eq('bar')
+    end
+  end
 end
