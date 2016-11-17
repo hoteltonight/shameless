@@ -1,5 +1,6 @@
 ### Unreleased
 
+* Add `Model#previous` and `Cell#previous`
 * `Model.put` now correctly looks up and updates an existing instance
 * Add `Model#update` and `Cell#update`
 * Expose `Model#base`

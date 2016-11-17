@@ -55,6 +55,13 @@ module Shameless
       @body
     end
 
+    def previous
+      if ref_key && previous_cell_values = @model.fetch_cell(@name, ref_key - 1)
+        previous_cell_values[:body] = deserialize_body(previous_cell_values[:body])
+        self.class.new(@model, @name, previous_cell_values)
+      end
+    end
+
     private
 
     def stringify_keys(body)

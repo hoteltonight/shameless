@@ -50,8 +50,9 @@ module Shameless
       @store.put(table_name, shardable_value, cell_values)
     end
 
-    def fetch_cell(shardable_value, uuid, cell_name)
+    def fetch_cell(shardable_value, uuid, cell_name, ref_key)
       query = {uuid: uuid, column_name: cell_name}
+      query[:ref_key] = ref_key if ref_key
 
       @store.where(table_name, shardable_value, query).order(:ref_key).last
     end
@@ -127,12 +128,16 @@ module Shameless
         @base.created_at
       end
 
+      def previous
+        @base.previous
+      end
+
       def put_cell(cell_values)
         self.class.put_cell(shardable_value, cell_values)
       end
 
-      def fetch_cell(cell_name)
-       self.class.fetch_cell(shardable_value, uuid, cell_name)
+      def fetch_cell(cell_name, ref_key = nil)
+       self.class.fetch_cell(shardable_value, uuid, cell_name, ref_key)
       end
 
       def prevent_readonly_attribute_mutation!(key)

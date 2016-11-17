@@ -89,4 +89,37 @@ describe Shameless::Cell do
       expect(instance.meta.ref_key).to eq(2)
     end
   end
+
+  describe '#previous' do
+    it 'returns nil for initial version' do
+      model = build_model_with_cell
+      instance = model.put(hotel_id: 1, room_type: 'roh', check_in_date: Date.today.to_s)
+
+      expect(instance.meta.previous).to be_nil
+    end
+
+    it 'returns nil for initial version after save' do
+      model = build_model_with_cell
+      instance = model.put(hotel_id: 1, room_type: 'roh', check_in_date: Date.today.to_s)
+      instance.meta[:net_rate] = 90
+      instance.meta.save
+
+      expect(instance.meta.previous).to be_nil
+    end
+
+    it 'returns the previous version of the cell' do
+      model = build_model_with_cell
+      instance = model.put(hotel_id: 1, room_type: 'roh', check_in_date: Date.today.to_s)
+      instance.meta[:net_rate] = 90
+      instance.meta.save
+
+      instance.meta[:net_rate] = 100
+      instance.meta.save
+
+      previous = instance.meta.previous
+      expect(instance.meta.ref_key).to eq(2)
+      expect(previous.ref_key).to eq(1)
+      expect(previous[:net_rate]).to eq(90)
+    end
+  end
 end

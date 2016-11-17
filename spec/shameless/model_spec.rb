@@ -114,4 +114,18 @@ describe Shameless::Model do
       expect(instance[:hotel_id]).to eq(1)
     end
   end
+
+  describe '#previous' do
+    it 'returns the previous version of the base cell' do
+      _, model = build_store
+      instance = model.put(hotel_id: 1, room_type: 'roh', check_in_date: Date.today.to_s, net_rate: 90)
+
+      instance.update(net_rate: 100)
+
+      previous = instance.previous
+      expect(instance.ref_key).to eq(2)
+      expect(previous.ref_key).to eq(1)
+      expect(previous[:net_rate]).to eq(90)
+    end
+  end
 end
