@@ -122,4 +122,19 @@ describe Shameless::Cell do
       expect(previous[:net_rate]).to eq(90)
     end
   end
+
+  describe '#reload' do
+    it 'lazily reloads cell state' do
+      model = build_model_with_cell
+      instance = model.put(hotel_id: 1, room_type: 'roh', check_in_date: Date.today.to_s)
+      instance.meta.update(net_rate: 90)
+
+      second_instance = model.where(hotel_id: 1).first
+      second_instance.meta.update(net_rate: 100)
+
+      instance.meta.reload
+      expect(instance.meta.ref_key).to eq(2)
+      expect(instance.meta[:net_rate]).to eq(100)
+    end
+  end
 end

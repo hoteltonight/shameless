@@ -62,6 +62,10 @@ module Shameless
       end
     end
 
+    def reload
+      @body = @ref_key = @created_at = nil
+    end
+
     private
 
     def stringify_keys(body)

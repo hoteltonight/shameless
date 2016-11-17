@@ -132,6 +132,10 @@ module Shameless
         @base.previous
       end
 
+      def reload
+        @base.reload
+      end
+
       def put_cell(cell_values)
         self.class.put_cell(shardable_value, cell_values)
       end
