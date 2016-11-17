@@ -73,4 +73,20 @@ describe Shameless::Cell do
 
     expect(fetched.meta.created_at).to eq(last_created_at)
   end
+
+  describe '#update' do
+    it 'assigns all values from argument' do
+      model = build_model_with_cell
+      instance = model.put(hotel_id: 1, room_type: 'roh', check_in_date: Date.today.to_s)
+
+      instance.meta.update(net_rate: 100)
+      expect(instance.meta[:net_rate]).to eq(100)
+      expect(instance.meta.ref_key).to eq(1)
+
+      instance.meta.update(gross_rate: 160)
+      expect(instance.meta[:net_rate]).to eq(100)
+      expect(instance.meta[:gross_rate]).to eq(160)
+      expect(instance.meta.ref_key).to eq(2)
+    end
+  end
 end

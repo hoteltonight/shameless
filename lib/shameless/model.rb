@@ -101,6 +101,10 @@ module Shameless
         @base[field] = value
       end
 
+      def update(values)
+        @base.update(values)
+      end
+
       def save
         @base.save
       end

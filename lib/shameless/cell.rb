@@ -31,6 +31,14 @@ module Shameless
       @model.put_cell(cell_values)
     end
 
+    def update(values)
+      values.each do |key, value|
+        self[key] = value
+      end
+
+      save
+    end
+
     def ref_key
       fetch
       @ref_key

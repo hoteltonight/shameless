@@ -92,4 +92,17 @@ describe Shameless::Model do
       expect(model.table_name).to eq("rates")
     end
   end
+
+  describe '#update' do
+    it 'assigns all values from argument' do
+      store, model = build_store
+      instance = model.put(hotel_id: 1, room_type: 'roh', check_in_date: Date.today.to_s, net_rate: 90)
+
+      instance.update(net_rate: 100)
+
+      expect(instance.ref_key).to eq(2)
+      expect(instance[:net_rate]).to eq(100)
+      expect(instance[:hotel_id]).to eq(1)
+    end
+  end
 end
