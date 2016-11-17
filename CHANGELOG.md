@@ -1,5 +1,6 @@
 ### Unreleased
 
+* Allow `Cell#save` to be called even without making any changes
 * Add `Model#fetch` and `Cell#fetch`
 * Add `Model#reload` and `Cell#reload`
 * Add `Model#previous` and `Cell#previous`

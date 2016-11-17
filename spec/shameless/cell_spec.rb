@@ -74,6 +74,19 @@ describe Shameless::Cell do
     expect(fetched.meta.created_at).to eq(last_created_at)
   end
 
+  it 'allows to call save without changing anything' do
+    model = build_model_with_cell
+    instance = model.put(hotel_id: 1, room_type: 'roh', check_in_date: Date.today.to_s)
+
+    instance.meta.save
+    expect(instance.meta.ref_key).to eq(1)
+
+    instance = model.where(hotel_id: 1).first
+
+    instance.meta.save
+    expect(instance.meta.ref_key).to eq(2)
+  end
+
   describe '#update' do
     it 'assigns all values from argument' do
       model = build_model_with_cell
