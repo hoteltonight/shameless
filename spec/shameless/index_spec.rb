@@ -6,6 +6,11 @@ describe Shameless::Index do
       class MyModel
         Store.attach(self)
 
+        index do
+          integer :primary_id
+          shard_on :primary_id
+        end
+
         index :foo do
           integer :my_id
           shard_on :my_id
@@ -13,7 +18,7 @@ describe Shameless::Index do
       end
     end
 
-    MyModel.put(my_id: 1, foo: 'bar')
+    MyModel.put(primary_id: 1, my_id: 1, foo: 'bar')
 
     instance = MyModel.foo_index.where(my_id: 1).first
 

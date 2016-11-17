@@ -65,6 +65,15 @@ describe Shameless::Model do
     expect { instance['hotel_id'] = 2 }.to raise_error(Shameless::ReadonlyAttributeMutation, message)
   end
 
+  it 'puts a new revision for a second put on the same index values' do
+    store, model = build_store
+    instance = model.put(hotel_id: 1, room_type: 'roh', check_in_date: Date.today.to_s, net_rate: 90)
+    second_instance = model.put(hotel_id: 1, room_type: 'roh', check_in_date: Date.today.to_s, net_rate: 100)
+
+    expect(second_instance.uuid).to eq(instance.uuid)
+    expect(second_instance.ref_key).to eq(2)
+  end
+
   it 'increments ref_key on update' do
     store, model = build_store
     instance = model.put(hotel_id: 1, room_type: 'roh', check_in_date: Date.today.to_s, net_rate: 90)

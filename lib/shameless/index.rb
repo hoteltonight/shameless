@@ -31,13 +31,14 @@ module Shameless
 
     def put(values)
       shardable_value = values.fetch(@shard_on)
-      index_values = (@columns.keys + [:uuid]).each_with_object({}) {|column, o| o[column] = values.fetch(column) }
+      index_values = index_values(values, true)
 
       @model.store.put(table_name, shardable_value, index_values)
     end
 
     def where(query)
       shardable_value = query.fetch(@shard_on)
+      query = index_values(query, false)
       @model.store.where(table_name, shardable_value, query).map {|r| @model.new(r[:uuid]) }
     end
 
@@ -47,6 +48,16 @@ module Shameless
 
     def full_name
       "#{@name}_index"
+    end
+
+    def index_values(values, all_required)
+      (@columns.keys + [:uuid]).each_with_object({}) do |column, o|
+        if all_required
+          o[column] = values.fetch(column)
+        else
+          o[column] = values[column] if values.key?(column)
+        end
+      end
     end
 
     def create_tables!
@@ -61,8 +72,12 @@ module Shameless
       end
     end
 
+    def column?(key)
+      @columns.keys.any? {|c| c.to_s == key.to_s }
+    end
+
     def prevent_readonly_attribute_mutation!(key)
-      if @columns.keys.any? {|c| c.to_s == key.to_s }
+      if column?(key)
         raise ReadonlyAttributeMutation, "The attribute #{key} cannot be modified because it's part of the #{@name} index"
       end
     end

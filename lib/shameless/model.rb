@@ -30,13 +30,19 @@ module Shameless
     end
 
     def put(values)
-      uuid = SecureRandom.uuid
+      if model = where(values).first
+        model_values = reject_index_values(values)
+        model.update(model_values)
+        model
+      else
+        uuid = SecureRandom.uuid
 
-      new(uuid, values).tap do |model|
-        model.save
+        new(uuid, values).tap do |model|
+          model.save
 
-        index_values = values.merge(uuid: uuid)
-        @indices.each {|i| i.put(index_values) }
+          index_values = values.merge(uuid: uuid)
+          @indices.each {|i| i.put(index_values) }
+        end
       end
     end
 
@@ -77,6 +83,10 @@ module Shameless
 
     def where(query)
       primary_index.where(query)
+    end
+
+    def reject_index_values(values)
+      values.reject {|k, _| @indices.any? {|i| i.column?(k) } }
     end
 
     def prevent_readonly_attribute_mutation!(key)

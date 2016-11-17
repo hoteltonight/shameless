@@ -5,13 +5,14 @@ module Shameless
     BASE = 'base'
 
     def self.base(model, body)
-      new(model, BASE, body)
+      new(model, BASE, body: body)
     end
 
-    def initialize(model, name, body = nil)
+    def initialize(model, name, values = nil)
       @model = model
       @name = name
-      @body = stringify_keys(body)
+      @body = stringify_keys(values[:body]) if values
+      initialize_from_values(values)
     end
 
     def [](key)
@@ -83,9 +84,15 @@ module Shameless
     def fetch
       if @body.nil?
         values = @model.fetch_cell(@name)
-        @ref_key = values[:ref_key] if values
-        @created_at = values[:created_at] if values
         @body = values ? deserialize_body(values[:body]) : {}
+        initialize_from_values(values)
+      end
+    end
+
+    def initialize_from_values(values)
+      if values
+        @ref_key = values[:ref_key]
+        @created_at = values[:created_at]
       end
     end
   end

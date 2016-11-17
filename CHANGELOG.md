@@ -1,5 +1,6 @@
 ### Unreleased
 
+* `Model.put` now correctly looks up and updates an existing instance
 * Add `Model#update` and `Cell#update`
 * Expose `Model#base`
 * Add `Configuration#legacy_created_at_is_bigint`
