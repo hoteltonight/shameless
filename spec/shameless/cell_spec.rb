@@ -175,4 +175,42 @@ describe Shameless::Cell do
       expect(instance.meta.fetch(:foo, 'bar')).to eq(false)
     end
   end
+
+  describe '#present?' do
+    it 'returns false if cell has not been saved yet' do
+      model = build_model_with_cell
+      instance = model.put(hotel_id: 1, room_type: 'roh', check_in_date: Date.today.to_s)
+
+      expect(instance.meta).not_to be_present
+    end
+
+    it 'returns false if cell has been modified but not saved' do
+      model = build_model_with_cell
+      instance = model.put(hotel_id: 1, room_type: 'roh', check_in_date: Date.today.to_s)
+
+      instance.meta[:net_rate] = 90
+
+      expect(instance.meta).not_to be_present
+    end
+
+    it 'returns true if cell has been saved' do
+      model = build_model_with_cell
+      instance = model.put(hotel_id: 1, room_type: 'roh', check_in_date: Date.today.to_s)
+
+      instance.meta.update(net_rate: 90)
+
+      expect(instance.meta).to be_present
+    end
+
+    it 'returns true if cell has been saved and reloaded' do
+      model = build_model_with_cell
+      instance = model.put(hotel_id: 1, room_type: 'roh', check_in_date: Date.today.to_s)
+
+      instance.meta.update(net_rate: 90)
+
+      instance = model.where(hotel_id: 1).first
+
+      expect(instance.meta).to be_present
+    end
+  end
 end

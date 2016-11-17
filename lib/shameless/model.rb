@@ -140,6 +140,10 @@ module Shameless
         @base.fetch(key, default)
       end
 
+      def present?
+        @base.present?
+      end
+
       def put_cell(cell_values)
         self.class.put_cell(shardable_value, cell_values)
       end

@@ -152,4 +152,21 @@ describe Shameless::Model do
       expect(instance.fetch(:foo, 'bar')).to eq('bar')
     end
   end
+
+  describe '#present?' do
+    it 'returns false if base cell does not exist' do
+      _, model = build_store
+      uuid = SecureRandom.uuid
+      instance = model.new(uuid)
+
+      expect(instance).not_to be_present
+    end
+
+    it 'returns true if base cell exists' do
+      _, model = build_store
+      instance = model.put(hotel_id: 1, room_type: 'roh', check_in_date: Date.today.to_s)
+
+      expect(instance).to be_present
+    end
+  end
 end

@@ -71,6 +71,11 @@ module Shameless
       body.key?(key.to_s) ? self[key] : default
     end
 
+    def present?
+      load
+      !@ref_key.nil?
+    end
+
     private
 
     def stringify_keys(body)
