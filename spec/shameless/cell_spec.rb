@@ -39,15 +39,15 @@ describe Shameless::Cell do
     instance.meta[:foo] = 'bar'
     instance.meta.save
 
-    expect(instance.meta.ref_key).to eq(1)
+    expect(instance.meta.ref_key).to eq(0)
 
     instance.meta.save
 
-    expect(instance.meta.ref_key).to eq(2)
+    expect(instance.meta.ref_key).to eq(1)
 
     fetched = model.where(hotel_id: 1).first
 
-    expect(fetched.meta.ref_key).to eq(2)
+    expect(fetched.meta.ref_key).to eq(1)
   end
 
   it 'touches created_at on save' do
@@ -79,12 +79,12 @@ describe Shameless::Cell do
     instance = model.put(hotel_id: 1, room_type: 'roh', check_in_date: Date.today.to_s)
 
     instance.meta.save
-    expect(instance.meta.ref_key).to eq(1)
+    expect(instance.meta.ref_key).to eq(0)
 
     instance = model.where(hotel_id: 1).first
 
     instance.meta.save
-    expect(instance.meta.ref_key).to eq(2)
+    expect(instance.meta.ref_key).to eq(1)
   end
 
   describe '#update' do
@@ -94,12 +94,12 @@ describe Shameless::Cell do
 
       instance.meta.update(net_rate: 100)
       expect(instance.meta[:net_rate]).to eq(100)
-      expect(instance.meta.ref_key).to eq(1)
+      expect(instance.meta.ref_key).to eq(0)
 
       instance.meta.update(gross_rate: 160)
       expect(instance.meta[:net_rate]).to eq(100)
       expect(instance.meta[:gross_rate]).to eq(160)
-      expect(instance.meta.ref_key).to eq(2)
+      expect(instance.meta.ref_key).to eq(1)
     end
   end
 
@@ -130,8 +130,8 @@ describe Shameless::Cell do
       instance.meta.save
 
       previous = instance.meta.previous
-      expect(instance.meta.ref_key).to eq(2)
-      expect(previous.ref_key).to eq(1)
+      expect(instance.meta.ref_key).to eq(1)
+      expect(previous.ref_key).to eq(0)
       expect(previous[:net_rate]).to eq(90)
     end
   end
@@ -146,7 +146,7 @@ describe Shameless::Cell do
       second_instance.meta.update(net_rate: 100)
 
       instance.meta.reload
-      expect(instance.meta.ref_key).to eq(2)
+      expect(instance.meta.ref_key).to eq(1)
       expect(instance.meta[:net_rate]).to eq(100)
     end
   end

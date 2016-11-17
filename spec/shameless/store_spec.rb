@@ -31,7 +31,7 @@ describe Shameless::Store do
 
     fetched = model.where(hotel_id: 1).first
     expect(fetched.uuid).to eq(instance.uuid)
-    expect(fetched.ref_key).to eq(1)
+    expect(fetched.ref_key).to eq(0)
   end
 
   it 'names the model by downcasing the class name' do

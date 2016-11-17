@@ -71,21 +71,21 @@ describe Shameless::Model do
     second_instance = model.put(hotel_id: 1, room_type: 'roh', check_in_date: Date.today.to_s, net_rate: 100)
 
     expect(second_instance.uuid).to eq(instance.uuid)
-    expect(second_instance.ref_key).to eq(2)
+    expect(second_instance.ref_key).to eq(1)
   end
 
   it 'increments ref_key on update' do
     store, model = build_store
     instance = model.put(hotel_id: 1, room_type: 'roh', check_in_date: Date.today.to_s, net_rate: 90)
 
-    expect(instance.ref_key).to eq(1)
+    expect(instance.ref_key).to eq(0)
 
     instance[:net_rate] = 100
     instance.save
 
-    expect(instance.ref_key).to eq(2)
+    expect(instance.ref_key).to eq(1)
     fetched = model.where(hotel_id: 1).first
-    expect(fetched.ref_key).to eq(2)
+    expect(fetched.ref_key).to eq(1)
   end
 
   describe '#table_name' do
@@ -109,7 +109,7 @@ describe Shameless::Model do
 
       instance.update(net_rate: 100)
 
-      expect(instance.ref_key).to eq(2)
+      expect(instance.ref_key).to eq(1)
       expect(instance[:net_rate]).to eq(100)
       expect(instance[:hotel_id]).to eq(1)
     end
@@ -123,8 +123,8 @@ describe Shameless::Model do
       instance.update(net_rate: 100)
 
       previous = instance.previous
-      expect(instance.ref_key).to eq(2)
-      expect(previous.ref_key).to eq(1)
+      expect(instance.ref_key).to eq(1)
+      expect(previous.ref_key).to eq(0)
       expect(previous[:net_rate]).to eq(90)
     end
   end
@@ -138,7 +138,7 @@ describe Shameless::Model do
       second_instance.update(net_rate: 100)
 
       instance.reload
-      expect(instance.ref_key).to eq(2)
+      expect(instance.ref_key).to eq(1)
       expect(instance[:net_rate]).to eq(100)
     end
   end
