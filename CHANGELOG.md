@@ -1,3 +1,7 @@
+### Unreleased
+
+* Use database-portable data types for index columns
+
 ### 0.3.0 (2016-11-18)
 
 * Add `Cell#uuid`

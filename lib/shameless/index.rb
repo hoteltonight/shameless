@@ -12,10 +12,10 @@ module Shameless
       instance_eval(&block)
     end
 
-    DataTypes = %i[integer string]
+    DataTypes = {integer: Integer, string: String}
 
-    DataTypes.each do |type|
-      define_method(type) do |column|
+    DataTypes.each do |name, type|
+      define_method(name) do |column|
         self.column(column, type)
       end
     end
