@@ -1,4 +1,4 @@
-### Unreleased
+### 0.3.1 (2016-11-18)
 
 * Use more static names for underlying database indices
 * Use database-portable data types for index columns
