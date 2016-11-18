@@ -81,11 +81,15 @@ module Shameless
       !@ref_key.nil?
     end
 
+    def uuid
+      @model.uuid
+    end
+
     private
 
     def cell_values
       {
-        uuid: @model.uuid,
+        uuid: uuid,
         column_name: @name,
         ref_key: ref_key,
         created_at: created_at,
