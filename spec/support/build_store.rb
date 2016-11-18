@@ -28,5 +28,23 @@ RSpec.configure do |c|
 
       [store, model]
     end
+
+    def build_model_with_cell
+      store, _ = build_store
+      Class.new do
+        store.attach(self, :rates)
+
+        index do
+          integer :hotel_id
+          string :room_type
+          string :check_in_date
+
+          shard_on :hotel_id
+        end
+
+        cell :meta
+        cell :ota_rate
+      end
+    end
   end)
 end

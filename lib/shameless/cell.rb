@@ -5,13 +5,19 @@ module Shameless
     BASE = 'base'
 
     def self.base(model, body)
-      new(model, BASE, body: body)
+      serialized_body = serialize_body(body)
+      new(model, BASE, body: serialized_body)
     end
+
+    def self.serialize_body(body)
+      MessagePack.pack(body)
+    end
+
+    attr_reader :model, :name
 
     def initialize(model, name, values = nil)
       @model = model
       @name = name
-      @body = stringify_keys(values[:body]) if values
       initialize_from_values(values)
     end
 
@@ -58,7 +64,6 @@ module Shameless
 
     def previous
       if ref_key && previous_cell_values = @model.fetch_cell(@name, ref_key - 1)
-        previous_cell_values[:body] = deserialize_body(previous_cell_values[:body])
         self.class.new(@model, @name, previous_cell_values)
       end
     end
@@ -78,10 +83,6 @@ module Shameless
 
     private
 
-    def stringify_keys(body)
-      Hash[body.map {|k, v| [k.to_s, v] }] if body
-    end
-
     def cell_values
       {
         uuid: @model.uuid,
@@ -93,7 +94,7 @@ module Shameless
     end
 
     def serialized_body
-      MessagePack.pack(body)
+      self.class.serialize_body(body)
     end
 
     def deserialize_body(body)
@@ -105,13 +106,14 @@ module Shameless
     def load
       if @body.nil?
         values = @model.fetch_cell(@name)
-        @body = values ? deserialize_body(values[:body]) : {}
         initialize_from_values(values)
+        @body ||= {}
       end
     end
 
     def initialize_from_values(values)
       if values
+        @body = deserialize_body(values[:body])
         @ref_key = values[:ref_key]
         @created_at = values[:created_at]
       end

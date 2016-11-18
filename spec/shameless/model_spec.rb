@@ -169,4 +169,54 @@ describe Shameless::Model do
       expect(instance).to be_present
     end
   end
+
+  describe '.fetch_latest_cells' do
+    def find_shard(model, instance)
+      model.store.find_shard(instance.send(:shardable_value))
+    end
+
+    it 'returns cells higher than given ID on a given shard' do
+      model = build_model_with_cell
+      instance = model.put(hotel_id: 1, room_type: 'roh', check_in_date: Date.today.to_s)
+      instance.meta.update(net_rate: 90)
+
+      second_instance = model.put(hotel_id: 2, room_type: 'roh', check_in_date: Date.today.to_s, net_rate: 100)
+      second_instance.ota_rate.update(net_rate: 89)
+
+      third_instance = model.put(hotel_id: 3, room_type: 'roh', check_in_date: Date.today.to_s)
+      third_instance.update(net_rate: 70)
+
+      expected_counts_per_shard = [0, 0, 0, 0]
+      expected_counts_per_shard[find_shard(model, instance)] += 2
+      expected_counts_per_shard[find_shard(model, second_instance)] += 2
+      expected_counts_per_shard[find_shard(model, third_instance)] += 2
+
+      expected_counts_per_shard.each_with_index do |count, i|
+        next if i.zero?
+
+        cells = model.fetch_latest_cells(shard: i, cursor: 0, limit: 50)
+        expect(cells.count).to eq(count)
+      end
+
+      another_instance = model.put(hotel_id: 4, room_type: 'roh', check_in_date: Date.today.to_s)
+      another_instance.meta.update(net_rate: 90)
+      another_instance.ota_rate.update(net_rate: 89)
+      another_instance.update(net_rate: 91)
+      another_instance.meta.update(net_rate: 92)
+
+      shard = find_shard(model, another_instance)
+      cells = model.fetch_latest_cells(shard: shard, cursor: expected_counts_per_shard[shard], limit: 50)
+
+      expect(cells.count).to eq(5)
+      expect(cells).to be_an_instance_of(Array)
+      expect(cells.map(&:name)).to eq(%i[base meta ota_rate base meta])
+      expect(cells.map(&:model).map(&:uuid)).to eq(Array.new(5) { another_instance.uuid })
+      expect(cells.map(&:ref_key)).to eq([0, 0, 0, 1, 1])
+      expect(cells.map {|c| c[:net_rate] }).to eq([nil, 90, 89, 91, 92])
+
+      cells = model.fetch_latest_cells(shard: shard, cursor: expected_counts_per_shard[shard], limit: 4)
+
+      expect(cells.count).to eq(4)
+    end
+  end
 end

@@ -1,21 +1,4 @@
 describe Shameless::Cell do
-  def build_model_with_cell
-    store, _ = build_store
-    Class.new do
-      store.attach(self, :rates)
-
-      index do
-        integer :hotel_id
-        string :room_type
-        string :check_in_date
-
-        shard_on :hotel_id
-      end
-
-      cell :meta
-    end
-  end
-
   it 'allows storing arbitrary content in cells' do
     model = build_model_with_cell
     instance = model.put(hotel_id: 1, room_type: 'roh', check_in_date: Date.today.to_s)

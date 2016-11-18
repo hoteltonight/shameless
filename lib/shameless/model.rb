@@ -57,6 +57,15 @@ module Shameless
       @store.where(table_name, shardable_value, query).order(:ref_key).last
     end
 
+    def fetch_latest_cells(shard:, cursor:, limit:)
+      query = ['id > ?', cursor]
+      @store.where(table_name, shard, query).limit(limit).map do |cell_values|
+        model = new(cell_values[:uuid])
+        name = cell_values[:column_name].to_sym
+        Cell.new(model, name, cell_values)
+      end
+    end
+
     def table_name
       [@store.name, @name].compact.join('_')
     end
