@@ -29,7 +29,6 @@ module Shameless
     def disconnect
       if instance_variable_defined?(:@partitions)
         partitions.each(&:disconnect)
-        remove_instance_variable(:@partitions)
       end
     end
 

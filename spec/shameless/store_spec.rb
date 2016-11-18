@@ -122,12 +122,15 @@ describe Shameless::Store do
   end
 
   describe '#disconnect' do
-    it 'nullifies partitions' do
+    it 'disconnects from partitions but keeps instances' do
       store, _ = build_store
+
+      partition = nil
+      store.each_partition {|p| partition = p }
 
       store.disconnect
 
-      expect(store.instance_variable_get(:@partitions)).to be_nil
+      store.each_partition {|p| expect(p).to eq(partition) }
     end
   end
 
