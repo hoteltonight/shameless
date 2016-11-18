@@ -108,8 +108,17 @@ describe Shameless::Store do
   it 'passes database extensions to Sequel' do
     db = double(Sequel::SQLite::Database).as_null_object
     allow(Sequel).to receive(:connect).and_return(db)
-    expect(db).to receive(:extension).with(:foo)
     build_store(database_extensions: [:foo])
+
+    expect(db).to have_received(:extension).with(:foo)
+  end
+
+  it 'passes create table options to create_table' do
+    db = double(Sequel::SQLite::Database).as_null_object
+    allow(Sequel).to receive(:connect).and_return(db)
+    build_store(create_table_options: {temp: true})
+
+    expect(db).to have_received(:create_table).with("store_rates_000000", temp: true)
   end
 
   describe '#padded_shard' do

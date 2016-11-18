@@ -1,6 +1,7 @@
 module Shameless
   class Configuration
-    attr_accessor :partition_urls, :shards_count, :connection_options, :database_extensions
+    attr_accessor :partition_urls, :shards_count, :connection_options, :database_extensions,
+      :create_table_options
 
     attr_accessor :legacy_created_at_is_bigint
 

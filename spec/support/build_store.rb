@@ -1,13 +1,14 @@
 RSpec.configure do |c|
   c.include(Module.new do
     def build_store(name: :store, partitions_count: 1, connection_options: nil, database_extensions: nil,
-      legacy_created_at_is_bigint: nil, &block)
+      legacy_created_at_is_bigint: nil, create_table_options: nil, &block)
       store = Shameless::Store.new(name) do |c|
         c.partition_urls = Array.new(partitions_count) { 'sqlite:/' }
         c.shards_count = 4
         c.connection_options = connection_options
         c.database_extensions = database_extensions
         c.legacy_created_at_is_bigint = legacy_created_at_is_bigint
+        c.create_table_options = create_table_options
       end
 
       model = Class.new do

@@ -1,5 +1,6 @@
 ### Unreleased
 
+* Add `Configuration#create_table_options`
 * Include shard in underlying index name
 
 ### 0.3.1 (2016-11-18)
