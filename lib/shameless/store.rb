@@ -46,7 +46,7 @@ module Shameless
       each_shard do |shard|
         partition = find_partition_for_shard(shard)
         sharded_table_name = table_name_with_shard(table_name, shard)
-        partition.create_table(sharded_table_name) { block.call(self) }
+        partition.create_table(sharded_table_name) { block.call(self, sharded_table_name) }
       end
     end
 

@@ -61,14 +61,14 @@ module Shameless
     end
 
     def create_tables!
-      @model.store.create_table!(table_name) do |t|
+      @model.store.create_table!(table_name) do |t, sharded_table_name|
         @columns.each do |name, type|
           t.column name, type, null: false
         end
 
         t.varchar :uuid, size: 36
 
-        t.index @columns.keys, name: "#{table_name}_index", unique: true
+        t.index @columns.keys, name: "#{sharded_table_name}_index", unique: true
       end
     end
 

@@ -75,7 +75,7 @@ module Shameless
     end
 
     def create_tables!
-      @store.create_table!(table_name) do |t|
+      @store.create_table!(table_name) do |t, sharded_table_name|
         t.primary_key :id
         t.varchar :uuid, size: 36
         t.varchar :column_name, null: false
@@ -85,7 +85,7 @@ module Shameless
         created_at_type = @store.configuration.legacy_created_at_is_bigint ? :bigint : :datetime
         t.column :created_at, created_at_type, null: false
 
-        t.index %i[uuid column_name ref_key], name: "#{table_name}_model", unique: true
+        t.index %i[uuid column_name ref_key], name: "#{sharded_table_name}_model", unique: true
       end
 
       @indices.each(&:create_tables!)
