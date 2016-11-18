@@ -1,4 +1,4 @@
-### Unreleased
+### 0.3.0 (2016-11-18)
 
 * Add `Cell#uuid`
 * Add `Cell#id`
