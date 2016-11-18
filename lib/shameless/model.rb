@@ -85,7 +85,7 @@ module Shameless
         created_at_type = @store.configuration.legacy_created_at_is_bigint ? :bigint : :datetime
         t.column :created_at, created_at_type, null: false
 
-        t.index %i[uuid column_name ref_key], unique: true
+        t.index %i[uuid column_name ref_key], name: "#{table_name}_model", unique: true
       end
 
       @indices.each(&:create_tables!)

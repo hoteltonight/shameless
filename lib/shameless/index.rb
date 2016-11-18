@@ -68,7 +68,7 @@ module Shameless
 
         t.varchar :uuid, size: 36
 
-        t.index @columns.keys, unique: true
+        t.index @columns.keys, name: "#{table_name}_index", unique: true
       end
     end
 
