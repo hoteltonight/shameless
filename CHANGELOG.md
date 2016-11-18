@@ -1,5 +1,6 @@
 ### Unreleased
 
+* Add `Cell#id`
 * Add `Model.fetch_latest_cells`
 * Initialize `ref_key` with zero, not one
 * Add `Model#present?` and `Cell#present?`

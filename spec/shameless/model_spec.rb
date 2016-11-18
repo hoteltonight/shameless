@@ -205,12 +205,14 @@ describe Shameless::Model do
       another_instance.meta.update(net_rate: 92)
 
       shard = find_shard(model, another_instance)
-      cells = model.fetch_latest_cells(shard: shard, cursor: expected_counts_per_shard[shard], limit: 50)
+      cursor = expected_counts_per_shard[shard]
+      cells = model.fetch_latest_cells(shard: shard, cursor: cursor, limit: 50)
 
       expect(cells.count).to eq(5)
       expect(cells).to be_an_instance_of(Array)
       expect(cells.map(&:name)).to eq(%i[base meta ota_rate base meta])
       expect(cells.map(&:model).map(&:uuid)).to eq(Array.new(5) { another_instance.uuid })
+      expect(cells.map(&:id)).to eq(Array.new(5) {|i| i + cursor + 1 })
       expect(cells.map(&:ref_key)).to eq([0, 0, 0, 1, 1])
       expect(cells.map {|c| c[:net_rate] }).to eq([nil, 90, 89, 91, 92])
 

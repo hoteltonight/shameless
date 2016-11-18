@@ -13,7 +13,7 @@ module Shameless
       MessagePack.pack(body)
     end
 
-    attr_reader :model, :name
+    attr_reader :model, :name, :id
 
     def initialize(model, name, values = nil)
       @model = model
@@ -113,6 +113,7 @@ module Shameless
 
     def initialize_from_values(values)
       if values
+        @id = values[:id]
         @body = deserialize_body(values[:body])
         @ref_key = values[:ref_key]
         @created_at = values[:created_at]
