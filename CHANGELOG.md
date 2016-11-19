@@ -1,5 +1,6 @@
 ### Unreleased
 
+* `Model#reload` now reloads all cells
 * Add `Model#cells`
 * Add `Configuration#create_table_options`
 * Include shard in underlying index name

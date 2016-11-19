@@ -144,16 +144,16 @@ module Shameless
         base.previous
       end
 
-      def reload
-        @base.reload
-      end
-
       def fetch(key, default)
         base.fetch(key, default)
       end
 
       def present?
         base.present?
+      end
+
+      def reload
+        cells.each(&:reload)
       end
 
       def cells
