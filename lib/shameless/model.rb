@@ -24,7 +24,6 @@ module Shameless
       name = name.to_s
 
       define_method(name) do
-        @cells ||= {}
         @cells[name] ||= Cell.new(self, name)
       end
     end
@@ -106,39 +105,43 @@ module Shameless
     private
 
     module InstanceMethods
-      attr_reader :uuid, :base
+      attr_reader :uuid
 
       def initialize(uuid, base_body = nil)
         @uuid = uuid
-        @base = Cell.base(self, base_body)
+        @cells = {Cell::BASE => Cell.base(self, base_body)}
+      end
+
+      def base
+        @cells[Cell::BASE]
       end
 
       def [](field)
-        @base[field]
+        base[field]
       end
 
       def []=(field, value)
-        @base[field] = value
+        base[field] = value
       end
 
       def update(values)
-        @base.update(values)
+        base.update(values)
       end
 
       def save
-        @base.save
+        base.save
       end
 
       def ref_key
-        @base.ref_key
+        base.ref_key
       end
 
       def created_at
-        @base.created_at
+        base.created_at
       end
 
       def previous
-        @base.previous
+        base.previous
       end
 
       def reload
@@ -146,11 +149,15 @@ module Shameless
       end
 
       def fetch(key, default)
-        @base.fetch(key, default)
+        base.fetch(key, default)
       end
 
       def present?
-        @base.present?
+        base.present?
+      end
+
+      def cells
+        @cells.values
       end
 
       def put_cell(cell_values)
