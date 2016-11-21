@@ -1,5 +1,7 @@
 ### Unreleased
 
+### 0.4.0 (2016-11-21)
+
 * `Model#reload` now reloads all cells
 * Add `Model#cells`
 * Add `Configuration#create_table_options`
