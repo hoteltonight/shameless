@@ -1,5 +1,7 @@
 # Shameless
 
+[![Build Status](https://travis-ci.org/hoteltonight/shameless.svg?branch=master)](https://travis-ci.org/hoteltonight/shameless)
+
 Shameless is an implementation of a schemaless, distributed, append-only store built on top of MySQL and the Sequel gem. It was extracted from a battle-tested codebase of our main application at HotelTonight. Since it's using Sequel for database access, it could work on any database, e.g. postgres, although we've only used it with MySQL.
 
 ## Background
