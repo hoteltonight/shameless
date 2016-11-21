@@ -54,7 +54,7 @@ describe Shameless::Cell do
 
     fetched = model.where(hotel_id: 1).first
 
-    expect(fetched.meta.created_at).to eq(last_created_at)
+    expect(fetched.meta.created_at).to be_within(0.001).of(last_created_at)
   end
 
   it 'allows to call save without changing anything' do
