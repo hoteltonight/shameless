@@ -57,6 +57,23 @@ describe Shameless::Cell do
     expect(fetched.meta.created_at).to be_within(0.001).of(last_created_at)
   end
 
+  it 'remembers id on save' do
+    model = build_model_with_cell
+
+    instance = model.put(hotel_id: 1, room_type: 'roh', check_in_date: Date.today.to_s)
+    expect(instance.base.id).to eq(1)
+
+    instance.meta[:foo] = 'bar'
+    instance.meta.save
+    expect(instance.meta.id).to eq(2)
+
+    second_instance = model.put(hotel_id: 1, room_type: 'roh', check_in_date: Date.today.to_s)
+    expect(second_instance.base.id).to eq(3)
+
+    second_instance.meta.save
+    expect(second_instance.meta.id).to eq(4)
+  end
+
   it 'allows to call save without changing anything' do
     model = build_model_with_cell
     instance = model.put(hotel_id: 1, room_type: 'roh', check_in_date: Date.today.to_s)
