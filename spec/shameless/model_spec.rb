@@ -1,6 +1,6 @@
 describe Shameless::Model do
   it 'initializes created_at' do
-    store, model = build_store
+    _, model = build_store
     now = Time.now
     instance = model.put(hotel_id: 1, room_type: 'roh', check_in_date: Date.today.to_s)
 
@@ -9,7 +9,7 @@ describe Shameless::Model do
 
   describe '#legacy_created_at_is_bigint' do
     it 'uses bigint for created_at' do
-      store, model = build_store(legacy_created_at_is_bigint: true)
+      _, model = build_store(legacy_created_at_is_bigint: true)
       before = Time.now
       instance = model.put(hotel_id: 1, room_type: 'roh', check_in_date: Date.today.to_s)
       after = Time.now
@@ -20,7 +20,7 @@ describe Shameless::Model do
   end
 
   it 'unifies symbol and string keys' do
-    store, model = build_store
+    _, model = build_store
     instance = model.put(hotel_id: 1, room_type: 'roh', check_in_date: Date.today.to_s, net_rate: 90)
 
     expect(instance["net_rate"]).to eq(90)
@@ -39,7 +39,7 @@ describe Shameless::Model do
   end
 
   it 'allows updates via the instance' do
-    store, model = build_store
+    _, model = build_store
     instance = model.put(hotel_id: 1, room_type: 'roh', check_in_date: Date.today.to_s, net_rate: 90)
 
     instance[:net_rate] = 100
@@ -50,7 +50,7 @@ describe Shameless::Model do
   end
 
   it 'prevents updates to index fields' do
-    store, model = build_store
+    _, model = build_store
     instance = model.put(hotel_id: 1, room_type: 'roh', check_in_date: Date.today.to_s, net_rate: 90)
 
     message = "The attribute hotel_id cannot be modified because it's part of the primary index"
@@ -58,7 +58,7 @@ describe Shameless::Model do
   end
 
   it 'prevents updates to index fields even when accessed as strings' do
-    store, model = build_store
+    _, model = build_store
     instance = model.put(hotel_id: 1, room_type: 'roh', check_in_date: Date.today.to_s, net_rate: 90)
 
     message = "The attribute hotel_id cannot be modified because it's part of the primary index"
@@ -66,7 +66,7 @@ describe Shameless::Model do
   end
 
   it 'puts a new revision for a second put on the same index values' do
-    store, model = build_store
+    _, model = build_store
     instance = model.put(hotel_id: 1, room_type: 'roh', check_in_date: Date.today.to_s, net_rate: 90)
     second_instance = model.put(hotel_id: 1, room_type: 'roh', check_in_date: Date.today.to_s, net_rate: 100)
 
@@ -75,7 +75,7 @@ describe Shameless::Model do
   end
 
   it 'increments ref_key on update' do
-    store, model = build_store
+    _, model = build_store
     instance = model.put(hotel_id: 1, room_type: 'roh', check_in_date: Date.today.to_s, net_rate: 90)
 
     expect(instance.ref_key).to eq(0)
@@ -104,7 +104,7 @@ describe Shameless::Model do
 
   describe '#update' do
     it 'assigns all values from argument' do
-      store, model = build_store
+      _, model = build_store
       instance = model.put(hotel_id: 1, room_type: 'roh', check_in_date: Date.today.to_s, net_rate: 90)
 
       instance.update(net_rate: 100)

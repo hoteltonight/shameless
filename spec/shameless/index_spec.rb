@@ -1,6 +1,6 @@
 describe Shameless::Index do
   it 'allows querying by a named index' do
-    store, model = build_store do |store|
+    build_store do |store|
       Store = store
 
       class MyModel

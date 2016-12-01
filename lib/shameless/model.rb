@@ -36,8 +36,8 @@ module Shameless
       else
         uuid = SecureRandom.uuid
 
-        new(uuid, values).tap do |model|
-          model.save
+        new(uuid, values).tap do |m|
+          m.save
 
           index_values = values.merge(uuid: uuid)
           @indices.each {|i| i.put(index_values) }

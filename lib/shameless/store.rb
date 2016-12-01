@@ -80,7 +80,7 @@ module Shameless
 
     def connect(url)
       Sequel.connect(url, @configuration.connection_options || Sequel::OPTS).tap do |db|
-        db.extension *@configuration.database_extensions
+        db.extension(*@configuration.database_extensions)
       end
     end
 

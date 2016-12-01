@@ -18,6 +18,7 @@ module Shameless
     def initialize(model, name, values = nil)
       @model = model
       @name = name
+      reload
       initialize_from_values(values)
     end
 
