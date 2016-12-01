@@ -69,7 +69,7 @@ module Shameless
     end
 
     def reload
-      @body = @ref_key = @created_at = nil
+      @id = @body = @ref_key = @created_at = nil
     end
 
     def fetch(key, default)
