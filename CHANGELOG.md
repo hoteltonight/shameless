@@ -1,5 +1,6 @@
 ### Unreleased
 
+* Add `Model#as_json` and `Cell#as_json`
 * Remember cell ID after save
 
 ### 0.4.0 (2016-11-21)

@@ -152,6 +152,10 @@ module Shameless
         base.present?
       end
 
+      def as_json(*)
+        base.as_json
+      end
+
       def reload
         cells.each(&:reload)
       end

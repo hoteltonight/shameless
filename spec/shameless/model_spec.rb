@@ -225,4 +225,25 @@ describe Shameless::Model do
       expect(cells.count).to eq(4)
     end
   end
+
+  describe '#as_json' do
+    it 'returns the base cell JSON representation' do
+      _, model = build_store
+      instance = model.put(hotel_id: 1, room_type: 'roh', check_in_date: Date.today.to_s, foo: 'bar')
+
+      expect(instance.as_json).to eq(
+        id: 1,
+        uuid: instance.uuid,
+        column_name: 'base',
+        ref_key: 0,
+        body: {
+          'hotel_id' => 1,
+          'room_type' => 'roh',
+          'check_in_date' => Date.today.to_s,
+          'foo' => 'bar'
+        },
+        created_at: instance.created_at
+      )
+    end
+  end
 end

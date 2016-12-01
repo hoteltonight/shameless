@@ -212,5 +212,25 @@ describe Shameless::Cell do
 
       expect(instance.meta).to be_present
     end
+
+  describe '#as_json' do
+    it 'returns the base cell JSON representation' do
+      model = build_model_with_cell
+      instance = model.put(hotel_id: 1, room_type: 'roh', check_in_date: Date.today.to_s)
+
+      instance.meta.update(net_rate: 90)
+
+      expect(instance.meta.as_json).to eq(
+        id: 2,
+        uuid: instance.uuid,
+        column_name: 'meta',
+        ref_key: 0,
+        body: {
+          'net_rate' => 90
+        },
+        created_at: instance.meta.created_at
+      )
+    end
+  end
   end
 end

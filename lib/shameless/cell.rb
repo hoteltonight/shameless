@@ -36,7 +36,7 @@ module Shameless
       @created_at = (@created_at.to_f * 1000).to_i if @model.class.store.configuration.legacy_created_at_is_bigint
       @ref_key ||= -1
       @ref_key += 1
-      @id = @model.put_cell(cell_values)
+      @id = @model.put_cell(cell_values(true))
     end
 
     def update(values)
@@ -85,15 +85,19 @@ module Shameless
       @model.uuid
     end
 
+    def as_json(*)
+      cell_values(false).merge(id: id)
+    end
+
     private
 
-    def cell_values
+    def cell_values(serialize_body)
       {
         uuid: uuid,
         column_name: @name,
         ref_key: ref_key,
         created_at: created_at,
-        body: serialized_body
+        body: serialize_body ? serialized_body : body
       }
     end
 
