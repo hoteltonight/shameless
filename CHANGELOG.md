@@ -1,5 +1,7 @@
 ### Unreleased
 
+### 0.5.1 (2016-12-01)
+
 * Convert shardable value to integer for index tables
 
 ### 0.5.0 (2016-12-01)
