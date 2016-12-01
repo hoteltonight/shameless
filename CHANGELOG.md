@@ -1,3 +1,7 @@
+### Unreleased
+
+* Convert shardable value to integer for index tables
+
 ### 0.5.0 (2016-12-01)
 
 * Add `Model#as_json` and `Cell#as_json`

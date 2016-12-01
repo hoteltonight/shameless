@@ -30,14 +30,14 @@ module Shameless
     end
 
     def put(values)
-      shardable_value = values.fetch(@shard_on)
+      shardable_value = values.fetch(@shard_on).to_i
       index_values = index_values(values, true)
 
       @model.store.put(table_name, shardable_value, index_values)
     end
 
     def where(query)
-      shardable_value = query.fetch(@shard_on)
+      shardable_value = query.fetch(@shard_on).to_i
       query = index_values(query, false)
       @model.store.where(table_name, shardable_value, query).map {|r| @model.new(r[:uuid]) }
     end

@@ -74,6 +74,13 @@ describe Shameless::Model do
     expect(second_instance.ref_key).to eq(1)
   end
 
+  it 'converts shardable value to integer but stores it verbatim' do
+    _, model = build_store
+    instance = model.put(hotel_id: '1', room_type: 'roh', check_in_date: Date.today.to_s, net_rate: 90)
+
+    expect(instance[:hotel_id]).to eq('1')
+  end
+
   it 'increments ref_key on update' do
     _, model = build_store
     instance = model.put(hotel_id: 1, room_type: 'roh', check_in_date: Date.today.to_s, net_rate: 90)
