@@ -1,5 +1,7 @@
 ### Unreleased
 
+### 0.5.2 (2016-12-02)
+
 * Eagerly initialize `Model#cells`
 
 ### 0.5.1 (2016-12-01)
