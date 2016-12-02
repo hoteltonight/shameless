@@ -8,6 +8,8 @@ module Shameless
     def attach_to(store, name)
       @store = store
       @name = name || self.name.downcase # TODO use activesupport?
+      @cell_names = []
+      cell(Cell::BASE)
 
       include(InstanceMethods)
     end
@@ -22,10 +24,16 @@ module Shameless
 
     def cell(name)
       name = name.to_s
+      @cell_names << name
 
-      define_method(name) do
-        @cells[name] ||= Cell.new(self, name)
-      end
+      define_method(name) { @cells[name] }
+    end
+
+    def initialize_cells(instance, base_body)
+      Hash[@cell_names.map do |name|
+        cell = name == Cell::BASE ? Cell.base(instance, base_body) : Cell.new(instance, name)
+        [name, cell]
+      end]
     end
 
     def put(values)
@@ -109,11 +117,7 @@ module Shameless
 
       def initialize(uuid, base_body = nil)
         @uuid = uuid
-        @cells = {Cell::BASE => Cell.base(self, base_body)}
-      end
-
-      def base
-        @cells[Cell::BASE]
+        @cells = self.class.initialize_cells(self, base_body)
       end
 
       def [](field)

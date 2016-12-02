@@ -95,6 +95,13 @@ describe Shameless::Model do
     expect(fetched.ref_key).to eq(1)
   end
 
+  it 'eagerly initializes all cells' do
+    model = build_model_with_cell
+    instance = model.put(hotel_id: 1, room_type: 'roh', check_in_date: Date.today.to_s)
+
+    expect(instance.cells.count).to eq(3)
+  end
+
   describe '#table_name' do
     it 'concatenates store name and model name' do
       _, model = build_store
