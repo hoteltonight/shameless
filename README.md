@@ -8,29 +8,29 @@ Shameless is an implementation of a schemaless, distributed, append-only store b
 
 Shameless was born out of our need to have highly scalable, distributed storage for hotel rates. Rates are a way hotels package their rooms, they typically include check-in and check-out date, room type, rate plan, net price, discount, extra services, etc. Our original solution of storing rates in a typical relational SQL table was reaching its limits due to write congestion, migration anxiety, and high maintenance.
 
-Hotel rates change very frequently, so our solution needed to have consistent write latency. There are also mutliple agents mutating various aspects of those rates, so we wanted something that would enable versioning. We also wanted to avoid having to create migrations whenever we were adding more data to rates.
+Hotel rates change very frequently, so our solution needed to have consistent write latency. There are also multiple agents mutating various aspects of those rates, so we wanted something that would enable versioning. We also wanted to avoid having to create migrations whenever we were adding more data to rates.
 
 ## Concept
 
 The whole idea of Shameless is to split a regular SQL table into index tables and content tables. Index tables map the fields you want to query by to UUIDs, content tables map UUIDs to model contents (bodies). In addition, both index and content tables are sharded.
 
-The body of the model is schema-less, you can store an arbitrary data structures. Under the hood, the body is serialized using MessagePack and stored as a blob in a single database column (hence the need for index tables).
+The body of the model is schema-less, you can store arbitrary data structures in it. Under the hood, the body is serialized using MessagePack and stored as a blob in a single database column (hence the need for index tables).
 
 The process of querying for records can be described as:
 
 1. Query the index tables by index fields (e.g. hotel ID, check-in date, and length of stay), sharded by hotel ID, getting get back a list of UUIDs
-2. Query the content tables, sharded by UUID, for most recent version of model
+1. Query the content tables, sharded by UUID, for most recent version of model
 
 Inserting a record is similar:
 
 1. Generate a UUID
-2. Serialize and write model content into appropriate shard of the content tables
-2. Insert a row (index fields + model UUID) to the appropriate shard of the index table
+1. Serialize and write model content into appropriate shard of the content tables
+1. Insert a row (index fields + model UUID) to the appropriate shard of the index table
 
 Inserting a new version of an existing record is even simpler:
 
 1. Increment version
-2. Serialize and write model content into appropriate shard of the content tables
+1. Serialize and write model content into appropriate shard of the content tables
 
 Naturally, shameless hides all that complexity behind a straight-forward API.
 
@@ -46,12 +46,13 @@ The core object of shameless is a `Store`. Here's how you can set one up:
 RateStore = Shameless::Store.new(:rate_store) do |c|
   c.partition_urls = [ENV['RATE_STORE_DATABASE_URL_0'], ENV['RATE_STORE_DATABASE_URL_1']
   c.shards_count = 512 # total number of shards across all partitions
-  c.connection_options = {max_connections: 10} # connection options passed to Sequel.connect
+  c.connection_options = {max_connections: 10} # connection options passed to `Sequel.connect`
   c.database_extensions = [:newrelic_instrumentation]
+  c.create_table_options = {engine: "InnoDB"} # passed to Sequel's `create_table`
 end
 ```
 
-The initializer argument (`:rate_store`) defines the namespace by which all tables will be prefixed, in this case `rate_store_`.
+The initializer argument (`:rate_store`) defines the namespace by which all tables will be prefixed, in this case `rate_store_`. If you pass `nil`, there will be no prefix.
 
 Once you've got the Store configured, you can declare models.
 
@@ -135,7 +136,9 @@ end
 
 ### Reading/writing
 
-To insert and query the model, use `Model.put` and `Model.where`:
+To write data to the model, use `Model.put` `Model#save`, `Cell#save`, `Model#update`, or `Cell#update`. `Model.put` will perform an "upsert", i.e. it will try to find an existing record with the given index fields, and insert a new version for that record's base cell if it finds one, or pick a new UUID, write the first version of the base cell, and write to all indices otherwise.
+
+Here are some examples of how you can read and write data from/to a shameless store:
 
 ```ruby
 # Writing - all index fields are required, the rest is the schemaless content
@@ -146,16 +149,82 @@ rate[:net_price] # => 120.0 # access in the "base" cell
 rate[:net_price] = 130.0
 rate.save
 
+# You can also access the "base" cell explicitly
+rate.base[:net_price] = 140.0
+rate.base.save
+
 # Reading from/writing to a different cell is simple, too:
 rate.meta[:hotel_enabled] = true
 rate.meta.save
 
+# You can also do that in one go using `Model#update` or `Cell#update`. This writes a new
+# version of the cell, merging the hash passed in as parameter with existing values.
+rate.update(tax_rate: 11.0, gateway: 'pegasus')
+rate.body # => {net_price: 140.0, tax_rate: 11.0, gateway: 'pegasus'}
+
+rate.meta.update(hotel_enabled: false)
+```
+
+To query, use `Model.where`:
+
+```ruby
 # Querying by primary index
 rates = Rate.where(hotel_id: 1, room_type: '1 bed', check_in_date: Date.today)
 
 # Querying by a named index
 rates = Rate.secondary_index.where(hotel_id: 1, gateway: 'pegasus', discount_type: 'geo')
 rates.first[:net_price] # => 130.0
+```
+
+To access a cell field that you're not sure has a value, you can use and `Cell#fetch` (`Model#fetch` delegates to the base cell) to get a value from a cell, or a default, e.g.:
+
+```ruby
+rate[:net_price] = 130.0
+rate.fetch(:net_price, 100) # => 130.0
+rate.meta.fetch(:enabled, true) # => true
+```
+
+Cells are versioned, the current version is stored in a column called `ref_key`. The first version of a cell has a `ref_key` of zero. To access a previous version of a cell, use `Cell#previous` (`Model#previous` delegates to the base cell). Example:
+
+```ruby
+# ...
+rate[:net_price] # => 120.0
+rate.ref_key # => 1
+rate.update(net_price: 130.0)
+rate.ref_key # => 2
+rate.previous[:net_price] # => 120.0
+rate.previous.ref_key # => 1
+rate.previous.previous.ref_key # => 0
+rate.previous.previous.previous # => nil
+```
+
+It could happen that another process may have updated a model/cell. To fetch the latest state, use `Cell#reload` (`Model#reload` reloads *all* cells), e.g.:
+
+```ruby
+rate[:net_price] # => 120.0
+
+# Another process updates the cell
+Rate.where(hotel_id: rate[:hotel_id]).first.update(net_price: 130.0)
+
+rate[:net_price] # => 120.0
+rate.reload
+rate[:net_price] # => 130.0
+```
+
+To check if a given cell exists, use `Cell#present?` (as you can suspect, `Model#present?` delegates to the base cell). You can also use `Model#cells` to iterate over all cells, e.g.:
+
+```ruby
+rate.present? # => true
+rate.meta.present? # => false
+
+rate.cells.any?(&:present?) # => true
+```
+
+To see the cell's full state (body + metadata), use `Cell#as_json` (`Model#as_json` delegates to the base cell), e.g.:
+
+```ruby
+rate.as_json # => {id: 123, uuid: "...", created_at: "...", column_name: "base", ref_key: 3,
+  # body: {hotel_id: 1, check_in_date: "2017-01-03", room_type: "ROH", net_price: 130.0}}
 ```
 
 ### Creating tables
@@ -167,6 +236,18 @@ RateStore.create_tables!
 ```
 
 This will create the underlying index tables, content tables, together with database indices for fast access.
+
+### Concurrent writes
+
+Since writes to shameless aren't atomic, concurrency control needs to be moved to application code. We're using a setup where almost all our writes go through queues, one queue per shard. We're using `Store#each_shard` to match queue names to shards and to aggregate queue stats across all shards.
+
+### Using shameless as a data stream store (similar to Kafka)
+
+Thanks to storing each write to shameless as a new record in the underlying database table, we're able to use our shameless store as a log for stream processing. For each shard, we have a worker that goes through all new entries in that shard and triggers various event processors to handle all kinds of asynchronous work. For that purpose, we're using `Model.fetch_latest_cells(shard:, cursor:, limit:)`, and incrementing a cursor (stored in Redis) after each record has been processed successfully. We're using the cells' IDs as cursors, using `Cell#id`, which returns the underlying table's primary key value.
+
+### Utilities
+
+Sometimes it may be useful to know where a given model will end up, based on its shardable value. For this, you can use `Store#find_shard(shardable_value)`, e.g.: `RateStore.find_shard(hotel.id) # => 196`.
 
 ## Installation
 
@@ -193,7 +274,6 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/hoteltonight/shameless.
-
 
 ## License
 
