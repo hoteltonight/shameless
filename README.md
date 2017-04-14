@@ -165,7 +165,7 @@ rate.body # => {net_price: 140.0, tax_rate: 11.0, gateway: 'pegasus'}
 rate.meta.update(hotel_enabled: false)
 ```
 
-To query, use `Model.where`:
+To query, use `Model.where` (also using Sequel's [virtual row blocks](http://sequel.jeremyevans.net/rdoc/files/doc/virtual_rows_rdoc.html)):
 
 ```ruby
 # Querying by primary index
@@ -174,6 +174,9 @@ rates = Rate.where(hotel_id: 1, room_type: '1 bed', check_in_date: Date.today)
 # Querying by a named index
 rates = Rate.secondary_index.where(hotel_id: 1, gateway: 'pegasus', discount_type: 'geo')
 rates.first[:net_price] # => 130.0
+
+# Query using Sequel's virtual row block (handy for inequality operators)
+rates = Rate.where(hotel_id: 1, room_type: '1 bed') { check_in_date > Date.today }
 ```
 
 To access a cell field that you're not sure has a value, you can use and `Cell#fetch` (`Model#fetch` delegates to the base cell) to get a value from a cell, or a default, e.g.:
