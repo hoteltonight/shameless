@@ -171,6 +171,28 @@ describe Shameless::Model do
     end
   end
 
+  describe '#where' do
+    it 'queries with hash based filter only' do
+      _, model = build_store
+      same_day_rate = model.put(hotel_id: 1, room_type: 'roh', check_in_date: Date.today.to_s, net_rate: 90)
+      model.put(hotel_id: 1, room_type: 'roh', check_in_date: (Date.today + 1).to_s, net_rate: 90)
+
+      result_ids = model.where(hotel_id: 1, check_in_date: Date.today.to_s).map(&:uuid)
+
+      expect(result_ids).to eq([same_day_rate.uuid])
+    end
+
+    it 'queries with block filters' do
+      _, model = build_store
+      model.put(hotel_id: 1, room_type: 'roh', check_in_date: Date.today.to_s, net_rate: 90)
+      advance_rate = model.put(hotel_id: 1, room_type: 'roh', check_in_date: (Date.today + 1).to_s, net_rate: 90)
+
+      result_ids = model.where(hotel_id: 1) { check_in_date > Date.today.to_s }.map(&:uuid)
+
+      expect(result_ids).to eq([advance_rate.uuid])
+    end
+  end
+
   describe '#present?' do
     it 'returns false if base cell does not exist' do
       _, model = build_store

@@ -22,8 +22,8 @@ module Shameless
       find_table(table_name, shardable_value).insert(values)
     end
 
-    def where(table_name, shardable_value, query)
-      find_table(table_name, shardable_value).where(query)
+    def where(table_name, shardable_value, query, &block)
+      find_table(table_name, shardable_value).where(query, &block)
     end
 
     def disconnect
