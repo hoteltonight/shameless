@@ -1,5 +1,7 @@
 ### Unreleased
 
+* Require `securerandom` explicitly
+
 ### 0.5.2 (2016-12-02)
 
 * Eagerly initialize `Model#cells`

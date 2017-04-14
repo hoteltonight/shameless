@@ -1,3 +1,4 @@
+require 'securerandom'
 require 'shameless/index'
 require 'shameless/cell'
 
