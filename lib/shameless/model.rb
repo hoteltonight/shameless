@@ -99,8 +99,8 @@ module Shameless
       @indices.each(&:create_tables!)
     end
 
-    def where(query)
-      primary_index.where(query)
+    def where(query, &block)
+      primary_index.where(query, &block)
     end
 
     def reject_index_values(values)

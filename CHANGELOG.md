@@ -1,6 +1,7 @@
 ### Unreleased
 
 * Require `securerandom` explicitly
+* Add support for queries using Sequel's virtual rows
 
 ### 0.5.2 (2016-12-02)
 
