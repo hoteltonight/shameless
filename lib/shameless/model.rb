@@ -66,7 +66,7 @@ module Shameless
     end
 
     def fetch_latest_cells(shard:, cursor:, limit:)
-      query = ['id > ?', cursor]
+      query = Sequel.lit("id > ?", cursor)
       @store.where(table_name, shard, query).limit(limit).map do |cell_values|
         model = new(cell_values[:uuid])
         name = cell_values[:column_name].to_sym
