@@ -5,8 +5,8 @@ require 'shameless/version'
 Gem::Specification.new do |spec|
   spec.name          = "shameless"
   spec.version       = Shameless::VERSION
-  spec.authors       = ["Olek Janiszewski"]
-  spec.email         = ["olek@hoteltonight.com"]
+  spec.authors       = ["Olek Janiszewski", "Chas Lemley", "Marek Rosa"]
+  spec.email         = ["olek@hoteltonight.com", "chas@hoteltonight.com", "marek@hoteltonight.com"]
 
   spec.summary       = %q{Scalable distributed append-only data store}
   spec.homepage      = "https://github.com/hoteltonight/shameless"
