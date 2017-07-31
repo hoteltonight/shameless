@@ -1,5 +1,9 @@
 ### Unreleased
 
+### 0.6.1 (2017-07-31)
+
+* Fix Sequel deprecation warning
+
 ### 0.6.0 (2017-07-26)
 
 * Require `securerandom` explicitly
