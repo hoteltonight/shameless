@@ -211,10 +211,6 @@ describe Shameless::Model do
   end
 
   describe '.fetch_latest_cells' do
-    def find_shard(model, instance)
-      model.store.find_shard(instance.send(:shardable_value))
-    end
-
     it 'returns cells higher than given ID on a given shard' do
       model = build_model_with_cell
       instance = model.put(hotel_id: 1, room_type: 'roh', check_in_date: Date.today.to_s)
@@ -282,4 +278,28 @@ describe Shameless::Model do
       )
     end
   end
+
+  describe '#max_id' do
+    it 'returns the maximum id' do
+      model = build_model_with_cell
+
+      expected_max_id_per_shard = [nil, nil, nil, nil]
+
+      expected_max_id_per_shard.each_with_index do |max_id, shard_id|
+        expect(model.max_id_on_shard(shard_id)).to eq expected_max_id_per_shard[shard_id]
+      end
+
+      instance = model.put(hotel_id: 1, room_type: 'roh', check_in_date: Date.today.to_s)
+
+      expected_max_id_per_shard[find_shard(model, instance)] = 1
+
+      expected_max_id_per_shard.each_with_index do |max_id, shard_id|
+        expect(model.max_id_on_shard(shard_id)).to eq expected_max_id_per_shard[shard_id]
+      end
+    end
+  end
+end
+
+def find_shard(model, instance)
+  model.store.find_shard(instance.send(:shardable_value))
 end

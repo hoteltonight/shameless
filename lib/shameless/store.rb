@@ -64,6 +64,13 @@ module Shameless
       shardable_value % @configuration.shards_count
     end
 
+    def find_table(table_name, shardable_value)
+      shard = find_shard(shardable_value)
+      partition = find_partition_for_shard(shard)
+      table_name = table_name_with_shard(table_name, shard)
+      partition.from(table_name)
+    end
+
     private
 
     def models_hash
@@ -101,13 +108,6 @@ module Shameless
 
     def format_shard(shard)
       shard.to_s.rjust(6, '0')
-    end
-
-    def find_table(table_name, shardable_value)
-      shard = find_shard(shardable_value)
-      partition = find_partition_for_shard(shard)
-      table_name = table_name_with_shard(table_name, shard)
-      partition.from(table_name)
     end
 
     def find_partition_for_shard(shard)
