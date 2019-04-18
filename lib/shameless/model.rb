@@ -74,6 +74,10 @@ module Shameless
       end
     end
 
+    def max_id_on_shard(shard)
+      @store.find_table(table_name, shard).max(:id)
+    end
+
     def table_name
       [@store.name, @name].compact.join('_')
     end
