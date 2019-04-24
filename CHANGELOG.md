@@ -2,7 +2,7 @@
 
 ### 0.7.0 (2019-04-23)
 
-* Add `Model.max_id_on_shard`
+* Add `Model#max_id_on_shard`
 
 ### 0.6.1 (2017-07-31)
 
